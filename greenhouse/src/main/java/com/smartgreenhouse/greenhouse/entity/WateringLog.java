@@ -1,5 +1,6 @@
 package com.smartgreenhouse.greenhouse.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,10 +18,11 @@ public class WateringLog {
 
     private LocalDateTime timestamp;
 
-    private double waterAmount;
+    private Double waterAmount;
 
     @ManyToOne
     @JoinColumn(name = "greenhouse_id")
+    @JsonBackReference
     private Greenhouse greenhouse;
 
 }
