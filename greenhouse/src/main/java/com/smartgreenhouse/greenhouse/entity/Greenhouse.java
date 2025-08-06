@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,5 +29,8 @@ public class Greenhouse {
 
     @OneToMany(mappedBy =  "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<WateringLog> wateringLogs;
+    private List<WateringLog> wateringLogs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL)
+    private List<Sensor> sensors = new ArrayList<>();
 }

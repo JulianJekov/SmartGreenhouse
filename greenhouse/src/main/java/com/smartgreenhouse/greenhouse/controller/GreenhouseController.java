@@ -22,32 +22,32 @@ public class GreenhouseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GreenhouseDTO> getGreenhouseById(@PathVariable Long id){
+    public ResponseEntity<GreenhouseDTO> getGreenhouseById(@PathVariable Long id) {
         GreenhouseDTO greenhouse = greenhouseService.getGreenhouseById(id);
         return ResponseEntity.ok(greenhouse);
     }
 
     @GetMapping
-    public ResponseEntity<List<GreenhouseDTO>> getAllGreenhouses(){
+    public ResponseEntity<List<GreenhouseDTO>> getAllGreenhouses() {
         List<GreenhouseDTO> allGreenhouses = greenhouseService.getAllGreenhouses();
         return ResponseEntity.ok(allGreenhouses);
     }
 
     @PostMapping
-    public ResponseEntity<GreenhouseDTO> createGreenhouse(@RequestBody @Valid CreateGreenhouseDTO  createGreenhouseDTO){
+    public ResponseEntity<GreenhouseDTO> createGreenhouse(@RequestBody @Valid CreateGreenhouseDTO createGreenhouseDTO) {
         GreenhouseDTO createdGreenhouse = greenhouseService.createGreenhouse(createGreenhouseDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdGreenhouse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<GreenhouseDTO> updateGreenhouse(@PathVariable Long id,
-                                                          @RequestBody @Valid UpdateGreenhouseDTO updateGreenhouseDTO){
+                                                          @RequestBody @Valid UpdateGreenhouseDTO updateGreenhouseDTO) {
         GreenhouseDTO updatedGreenhouse = greenhouseService.updateGreenhouse(id, updateGreenhouseDTO);
         return ResponseEntity.ok(updatedGreenhouse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<GreenhouseDTO> deleteGreenhouse(@PathVariable Long id){
+    public ResponseEntity<Void> deleteGreenhouse(@PathVariable Long id) {
         greenhouseService.deleteGreenhouse(id);
         return ResponseEntity.noContent().build();
     }
