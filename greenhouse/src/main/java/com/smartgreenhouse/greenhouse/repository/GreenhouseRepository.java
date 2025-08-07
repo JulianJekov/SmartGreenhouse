@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GreenhouseRepository extends JpaRepository<Greenhouse, Long> {
+    boolean existsByNameAndIdNot(String name, Long id);
+    boolean existsByName(String name);
 }
