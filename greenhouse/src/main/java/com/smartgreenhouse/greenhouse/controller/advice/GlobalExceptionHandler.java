@@ -1,8 +1,11 @@
 package com.smartgreenhouse.greenhouse.controller.advice;
 
+import com.smartgreenhouse.greenhouse.exceptions.NameAlreadyExistsException;
 import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -27,6 +30,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ObjectNotFoundException.class)
     public ResponseEntity<String> handleEntityNotFoundException(ObjectNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(NameAlreadyExistsException.class)
+    public ResponseEntity<String> handleNameAlreadyExistsException(NameAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
