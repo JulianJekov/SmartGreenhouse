@@ -36,11 +36,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NameAlreadyExistsException.class)
     public ResponseEntity<String> handleNameAlreadyExistsException(NameAlreadyExistsException ex) {
+        LOGGER.info("Duplicate name detected: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        LOGGER.warn("Validation failed: {}", ex.getMessage());
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -56,6 +58,8 @@ public class GlobalExceptionHandler {
         if (rootCause instanceof InvalidFormatException ife &&
                 ife.getTargetType() != null &&
                 ife.getTargetType().isEnum()) {
+            String invalidValue = ife.getValue().toString();
+            LOGGER.debug("Invalid enum value provided: {}", invalidValue);
             String enumValue = Arrays.toString(SensorType.values());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid sensor type. Valid values are " + enumValue);
         }
