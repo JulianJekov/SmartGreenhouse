@@ -69,11 +69,10 @@ public class SensorServiceImpl implements SensorService {
     @Override
     @Transactional
     public void deleteSensor(Long id) {
-        try {
-            sensorRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException ex) {
+        if (!sensorRepository.existsById(id)) {
             throw new ObjectNotFoundException("Sensor not found with ID: " + id);
         }
+        sensorRepository.deleteById(id);
     }
 
     private Sensor getSensorOrThrow(Long id) {
