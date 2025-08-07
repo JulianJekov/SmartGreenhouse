@@ -56,11 +56,11 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         Greenhouse greenhouse = greenhouseRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
         String updatedName = dto.getName();
-        if (greenhouseRepository.existsByNameAndIdNot(updatedName, id)){
+        if (greenhouseRepository.existsByNameAndIdNot(updatedName, id)) {
             throw new NameAlreadyExistsException("Greenhouse with this name: " + updatedName + " already exists");
         }
-        greenhouseMapper.updateEntity(dto,  greenhouse);
-        Greenhouse updated =  greenhouseRepository.save(greenhouse);
+        greenhouseMapper.updateEntity(dto, greenhouse);
+        Greenhouse updated = greenhouseRepository.save(greenhouse);
         return greenhouseMapper.toDto(updated);
     }
 

@@ -10,7 +10,6 @@ import com.smartgreenhouse.greenhouse.repository.GreenhouseRepository;
 import com.smartgreenhouse.greenhouse.repository.SensorRepository;
 import com.smartgreenhouse.greenhouse.service.SensorService;
 import com.smartgreenhouse.greenhouse.util.sensorMapper.SensorMapper;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

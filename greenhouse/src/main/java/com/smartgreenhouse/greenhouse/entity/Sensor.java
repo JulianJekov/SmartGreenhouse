@@ -35,6 +35,6 @@ public class Sensor {
     private Boolean isActive;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "greenhouse_id",  nullable = false)
+    @JoinColumn(name = "greenhouse_id", nullable = false)
     private Greenhouse greenhouse;
 }

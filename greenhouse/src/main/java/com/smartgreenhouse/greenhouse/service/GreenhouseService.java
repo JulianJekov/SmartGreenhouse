@@ -9,8 +9,12 @@ import java.util.List;
 
 public interface GreenhouseService {
     GreenhouseDTO getGreenhouseById(Long id);
+
     List<GreenhouseDTO> getAllGreenhouses();
+
     GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto);
+
     GreenhouseDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto);
+
     void deleteGreenhouse(Long id);
 }

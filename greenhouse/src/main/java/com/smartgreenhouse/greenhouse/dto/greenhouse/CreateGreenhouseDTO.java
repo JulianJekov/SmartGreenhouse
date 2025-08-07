@@ -1,12 +1,10 @@
 package com.smartgreenhouse.greenhouse.dto.greenhouse;
 
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @Setter

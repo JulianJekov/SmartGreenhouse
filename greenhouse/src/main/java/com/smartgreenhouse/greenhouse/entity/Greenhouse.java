@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Greenhouse {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
@@ -30,10 +30,10 @@ public class Greenhouse {
     @Column(nullable = false)
     private Integer capacity;
 
-    @OneToMany(mappedBy =  "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<WateringLog> wateringLogs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL,  orphanRemoval = true)
+    @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sensor> sensors = new ArrayList<>();
 }
