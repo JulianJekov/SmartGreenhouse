@@ -29,17 +29,17 @@ public class SensorMapper {
         sensor.setUnit(dto.getUnit());
         sensor.setMinThreshold(dto.getMinThreshold());
         sensor.setMaxThreshold(dto.getMaxThreshold());
-        sensor.setIsActive(dto.isActive());
+        sensor.setIsActive(dto.getIsActive());
         sensor.setGreenhouse(greenhouse);
         return sensor;
     }
 
     public void updateEntity(UpdateSensorDTO dto, Sensor sensor, Greenhouse greenhouse) {
-        sensor.setSensorType(dto.getType());
+        sensor.setSensorType(dto.getSensorType());
         sensor.setUnit(dto.getUnit());
         sensor.setMinThreshold(dto.getMinThreshold());
         sensor.setMaxThreshold(dto.getMaxThreshold());
-        sensor.setIsActive(dto.isActive());
+        sensor.setIsActive(dto.getIsActive());
         sensor.setGreenhouse(greenhouse); // If we want to change greenhouse later
     }
 }
