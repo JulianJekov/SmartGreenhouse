@@ -2,9 +2,6 @@ package com.smartgreenhouse.greenhouse.entity;
 
 import com.smartgreenhouse.greenhouse.enums.SensorType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
