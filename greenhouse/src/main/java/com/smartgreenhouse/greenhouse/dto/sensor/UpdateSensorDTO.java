@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdateSensorDTO {
 
-    private SensorType type;
+    private SensorType sensorType;
 
     private String unit;
 
@@ -20,7 +20,7 @@ public class UpdateSensorDTO {
 
     private Double maxThreshold;
 
-    private boolean isActive;
+    private Boolean isActive;
 
     private Long greenhouseId;
 }
