@@ -15,6 +15,6 @@ public class CreateSensorDTO {
     private String unit;
     private Double minThreshold;
     private Double maxThreshold;
-    private boolean isActive = true;
+    private Boolean isActive = true;
     private Long greenhouseId;
 }
