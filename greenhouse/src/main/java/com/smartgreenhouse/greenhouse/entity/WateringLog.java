@@ -16,12 +16,14 @@ public class WateringLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDateTime timestamp;
 
+    @Column(nullable = false)
     private Double waterAmount;
 
-    @ManyToOne
-    @JoinColumn(name = "greenhouse_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "greenhouse_id", nullable = false)
     @JsonBackReference
     private Greenhouse greenhouse;
 

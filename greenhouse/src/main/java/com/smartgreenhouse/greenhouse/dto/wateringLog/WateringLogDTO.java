@@ -11,5 +11,6 @@ import java.time.LocalDateTime;
 public class WateringLogDTO {
     private Long id;
     private LocalDateTime timestamp;
-    private Double amount;
+    private Double waterAmount;
+    private Long greenhouseId;
 }
