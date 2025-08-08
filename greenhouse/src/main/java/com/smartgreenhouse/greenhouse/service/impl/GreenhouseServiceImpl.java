@@ -10,6 +10,7 @@ import com.smartgreenhouse.greenhouse.repository.GreenhouseRepository;
 import com.smartgreenhouse.greenhouse.service.GreenhouseService;
 import com.smartgreenhouse.greenhouse.util.greenhouseMapper.GreenhouseMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,13 +27,14 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         this.greenhouseMapper = greenhouseMapper;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public GreenhouseDTO getGreenhouseById(Long id) {
-        Greenhouse greenhouse = greenhouseRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
+        Greenhouse greenhouse = getGreenhouseOrThrow(id);
         return greenhouseMapper.toDto(greenhouse);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<GreenhouseDTO> getAllGreenhouses() {
         return greenhouseRepository.findAll().stream()
@@ -40,35 +42,43 @@ public class GreenhouseServiceImpl implements GreenhouseService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto) {
-        String name = dto.getName();
-        if (greenhouseRepository.existsByName(name)) {
-            throw new NameAlreadyExistsException("Greenhouse with this name: " + name + ", already exists");
-        }
+        throwIfDuplicatedNames(dto.getName());
         Greenhouse greenhouse = greenhouseMapper.toEntity(dto);
         greenhouseRepository.save(greenhouse);
         return greenhouseMapper.toDto(greenhouse);
     }
 
+    @Transactional
     @Override
     public GreenhouseDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto) {
-        Greenhouse greenhouse = greenhouseRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
-        String updatedName = dto.getName();
-        if (greenhouseRepository.existsByNameAndIdNot(updatedName, id)) {
-            throw new NameAlreadyExistsException("Greenhouse with this name: " + updatedName + " already exists");
-        }
+        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+        throwIfDuplicatedNames(dto.getName());
         greenhouseMapper.updateEntity(dto, greenhouse);
         Greenhouse updated = greenhouseRepository.save(greenhouse);
         return greenhouseMapper.toDto(updated);
     }
 
+    @Transactional
     @Override
     public void deleteGreenhouse(Long id) {
         if (!greenhouseRepository.existsById(id)) {
             throw new ObjectNotFoundException("Greenhouse not found with ID: " + id);
         }
         greenhouseRepository.deleteById(id);
+    }
+
+    private Greenhouse getGreenhouseOrThrow(Long id) {
+        return greenhouseRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
+    }
+
+
+    private void throwIfDuplicatedNames(String name) {
+        if (greenhouseRepository.existsByName(name)) {
+            throw new NameAlreadyExistsException("Greenhouse with this name: " + name + ", already exists");
+        }
     }
 }
