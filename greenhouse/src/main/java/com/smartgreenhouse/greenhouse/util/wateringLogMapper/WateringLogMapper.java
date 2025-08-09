@@ -6,8 +6,6 @@ import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.WateringLog;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 public class WateringLogMapper {
 
@@ -23,7 +21,6 @@ public class WateringLogMapper {
     public WateringLog toEntity(CreateWateringLogDTO dto, Greenhouse greenhouse) {
         WateringLog wateringLog = new WateringLog();
         wateringLog.setWaterAmount(dto.getWaterAmount());
-        wateringLog.setTimestamp(LocalDateTime.now());
         wateringLog.setGreenhouse(greenhouse);
         return wateringLog;
     }

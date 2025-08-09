@@ -27,4 +27,9 @@ public class WateringLog {
     @JsonBackReference
     private Greenhouse greenhouse;
 
+    @PrePersist
+    private void prePersist(){
+        if (timestamp == null)
+            timestamp = LocalDateTime.now();
+    }
 }
