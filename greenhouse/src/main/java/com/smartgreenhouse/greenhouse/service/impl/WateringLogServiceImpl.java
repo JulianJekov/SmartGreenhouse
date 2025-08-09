@@ -9,11 +9,12 @@ import com.smartgreenhouse.greenhouse.repository.GreenhouseRepository;
 import com.smartgreenhouse.greenhouse.repository.WateringLogRepository;
 import com.smartgreenhouse.greenhouse.service.WateringLogService;
 import com.smartgreenhouse.greenhouse.util.wateringLogMapper.WateringLogMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class WateringLogServiceImpl implements WateringLogService {
@@ -31,8 +32,8 @@ public class WateringLogServiceImpl implements WateringLogService {
     @Transactional
     @Override
     public WateringLogDTO createWateringLog(CreateWateringLogDTO dto) {
-        Greenhouse greenhouse = greenhouseRepository.findById(dto.getGreenhouseId())
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + dto.getGreenhouseId()));
+        Long greenhouseId = dto.getGreenhouseId();
+        Greenhouse greenhouse = getGreenhouseOrThrow(greenhouseId);
         WateringLog wateringLog = wateringLogMapper.toEntity(dto, greenhouse);
         WateringLog saved = wateringLogRepository.save(wateringLog);
         return wateringLogMapper.toDto(saved);
@@ -40,24 +41,23 @@ public class WateringLogServiceImpl implements WateringLogService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<WateringLogDTO> getWateringLogByGreenhouseId(Long greenhouseId) {
-        if (!greenhouseRepository.existsById(greenhouseId)) {
-            throw new ObjectNotFoundException("Greenhouse not found with ID: " + greenhouseId);
-        }
-
-        return wateringLogRepository.findByGreenhouseId(greenhouseId)
-                .stream()
-                .map(wateringLogMapper::toDto)
-                .toList();
+    public Page<WateringLogDTO> getWateringLogByGreenhouseId(Long greenhouseId, int page, int size) {
+        getGreenhouseOrThrow(greenhouseId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+        return wateringLogRepository.findByGreenhouseId(greenhouseId, pageable)
+                .map(wateringLogMapper::toDto);
     }
 
-    //TODO: Change it to pagination
     @Transactional(readOnly = true)
     @Override
-    public List<WateringLogDTO> getAllWateringLogs() {
-        return wateringLogRepository.findAll()
-                .stream()
-                .map(wateringLogMapper::toDto)
-                .toList();
+    public Page<WateringLogDTO> getAllWateringLogs(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+        return wateringLogRepository.findAll(pageable)
+                .map(wateringLogMapper::toDto);
+    }
+
+    private Greenhouse getGreenhouseOrThrow(Long greenhouseId) {
+        return greenhouseRepository.findById(greenhouseId)
+                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + greenhouseId));
     }
 }

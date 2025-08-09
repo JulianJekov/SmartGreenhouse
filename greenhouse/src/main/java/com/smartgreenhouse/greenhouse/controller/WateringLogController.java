@@ -4,11 +4,10 @@ import com.smartgreenhouse.greenhouse.dto.wateringLog.CreateWateringLogDTO;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.WateringLogDTO;
 import com.smartgreenhouse.greenhouse.service.WateringLogService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/watering-logs")
@@ -27,14 +26,17 @@ public class WateringLogController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WateringLogDTO>> getAllWateringLogs() {
-        List<WateringLogDTO> allWateringLogs = wateringLogService.getAllWateringLogs();
+    public ResponseEntity<Page<WateringLogDTO>> getAllWateringLogs(@RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "10") int size){
+        Page<WateringLogDTO> allWateringLogs = wateringLogService.getAllWateringLogs(page, size);
         return ResponseEntity.ok(allWateringLogs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<WateringLogDTO>> getWateringLogByGreenhouse(@PathVariable Long id) {
-        List<WateringLogDTO> wateringLogByGreenhouseId = wateringLogService.getWateringLogByGreenhouseId(id);
+    public ResponseEntity<Page<WateringLogDTO>> getWateringLogByGreenhouse(@PathVariable Long id,
+                                                                           @RequestParam(defaultValue = "0") int page,
+                                                                           @RequestParam(defaultValue = "10") int size) {
+        Page<WateringLogDTO> wateringLogByGreenhouseId = wateringLogService.getWateringLogByGreenhouseId(id, page, size);
         return ResponseEntity.ok(wateringLogByGreenhouseId);
     }
 }

@@ -2,15 +2,14 @@ package com.smartgreenhouse.greenhouse.service;
 
 import com.smartgreenhouse.greenhouse.dto.wateringLog.CreateWateringLogDTO;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.WateringLogDTO;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface WateringLogService {
     WateringLogDTO createWateringLog(CreateWateringLogDTO dto);
 
-    List<WateringLogDTO> getWateringLogByGreenhouseId(Long id);
+    Page<WateringLogDTO> getWateringLogByGreenhouseId(Long id, int page, int size);
 
-    List<WateringLogDTO> getAllWateringLogs();
+    Page<WateringLogDTO> getAllWateringLogs(int page, int size);
 
 
 }
