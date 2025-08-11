@@ -30,6 +30,15 @@ public class Greenhouse {
     @Column(nullable = false)
     private Integer capacity;
 
+    @Column(nullable = false)
+    private Double moistureThreshold = 40.0;
+
+    @Column(nullable = false)
+    private Double defaultWateringAmount = 20.0;
+
+    @Column(nullable = false)
+    private Boolean autoWateringEnabled = true;
+
     @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<WateringLog> wateringLogs = new ArrayList<>();
