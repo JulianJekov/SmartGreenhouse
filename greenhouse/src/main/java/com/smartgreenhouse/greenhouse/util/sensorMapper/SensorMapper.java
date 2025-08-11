@@ -13,13 +13,14 @@ public class SensorMapper {
     public SensorDTO toDto(Sensor sensor){
         SensorDTO dto = new SensorDTO();
         dto.setId(sensor.getId());
-        dto.setType(sensor.getSensorType());
+        dto.setSensorType(sensor.getSensorType());
         dto.setUnit(sensor.getUnit());
         dto.setMinThreshold(sensor.getMinThreshold());
         dto.setMaxThreshold(sensor.getMaxThreshold());
-        dto.setActive(sensor.getIsActive());
-        dto.setGreenhouseName(sensor.getGreenhouse().getName());
+        dto.setCurrentValue(sensor.getCurrentValue());
+        dto.setIsActive(sensor.getIsActive());
         dto.setGreenhouseId(sensor.getGreenhouse().getId());
+        dto.setGreenhouseName(sensor.getGreenhouse().getName());
         return dto;
     }
 
