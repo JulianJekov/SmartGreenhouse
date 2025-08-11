@@ -23,17 +23,17 @@ public class WateringLog {
     @Column(nullable = false)
     private Double waterAmount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WateringSource wateringSource;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "greenhouse_id", nullable = false)
     @JsonBackReference
     private Greenhouse greenhouse;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private WateringSource wateringSource;
-
     @PrePersist
-    private void prePersist(){
+    private void prePersist() {
         if (timestamp == null)
             timestamp = LocalDateTime.now();
     }
