@@ -23,4 +23,15 @@ public class UpdateGreenhouseDTO {
     @NotNull(message = "Capacity is required")
     @Min(value = 1, message = "Capacity must be at least 1")
     private Integer capacity;
+
+    @NotNull(message = "Moisture threshold is required")
+    @Positive(message = "Moisture threshold must be positive")
+    private Double moistureThreshold = 40.0;
+
+    @NotNull(message = "Default watering amount is required")
+    @Positive(message = "Default watering amount must be positive")
+    private Double defaultWateringAmount = 20.0;
+
+    @NotNull(message = "Auto-watering enabled flag is required")
+    private Boolean autoWateringEnabled = true;
 }

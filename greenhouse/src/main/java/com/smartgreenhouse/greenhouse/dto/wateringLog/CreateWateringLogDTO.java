@@ -1,5 +1,6 @@
 package com.smartgreenhouse.greenhouse.dto.wateringLog;
 
+import com.smartgreenhouse.greenhouse.enums.WateringSource;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -19,4 +20,7 @@ public class CreateWateringLogDTO {
 
     @NotNull(message = "Greenhouse ID is required")
     private Long greenhouseId;
+
+    @NotNull(message = "Watering source is required")
+    private WateringSource wateringSource;
 }

@@ -12,11 +12,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SensorDTO {
     private Long id;
-    private SensorType type;
+    private SensorType sensorType;
     private String unit;
     private Double minThreshold;
     private Double maxThreshold;
-    private boolean isActive;
+    private Double currentValue;
+    private Boolean isActive;
     private Long greenhouseId;
     private String greenhouseName;
 }
