@@ -1,6 +1,7 @@
 package com.smartgreenhouse.greenhouse.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.smartgreenhouse.greenhouse.enums.SensorType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table
@@ -45,4 +47,10 @@ public class Greenhouse {
 
     @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sensor> sensors = new ArrayList<>();
+
+    public Optional<Sensor> getMoistureSensor() {
+        return sensors.stream()
+                .filter(s -> s.getSensorType() == SensorType.SOIL_MOISTURE && s.getIsActive())
+                .findFirst();
+    }
 }
