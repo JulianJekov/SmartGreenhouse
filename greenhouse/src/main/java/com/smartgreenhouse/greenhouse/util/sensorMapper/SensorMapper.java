@@ -17,7 +17,6 @@ public class SensorMapper {
         dto.setUnit(sensor.getUnit());
         dto.setMinThreshold(sensor.getMinThreshold());
         dto.setMaxThreshold(sensor.getMaxThreshold());
-        dto.setCurrentValue(sensor.getCurrentValue());
         dto.setIsActive(sensor.getIsActive());
         dto.setGreenhouseId(sensor.getGreenhouse().getId());
         dto.setGreenhouseName(sensor.getGreenhouse().getName());
