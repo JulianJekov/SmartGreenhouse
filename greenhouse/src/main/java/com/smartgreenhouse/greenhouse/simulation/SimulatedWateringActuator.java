@@ -1,4 +1,4 @@
-package com.smartgreenhouse.greenhouse.actuator;
+package com.smartgreenhouse.greenhouse.simulation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

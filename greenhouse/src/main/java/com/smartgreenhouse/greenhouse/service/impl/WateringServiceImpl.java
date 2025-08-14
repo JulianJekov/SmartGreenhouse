@@ -1,6 +1,6 @@
 package com.smartgreenhouse.greenhouse.service.impl;
 
-import com.smartgreenhouse.greenhouse.actuator.SimulatedWateringActuator;
+import com.smartgreenhouse.greenhouse.simulation.SimulatedWateringActuator;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.CreateWateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.WateringLog;
