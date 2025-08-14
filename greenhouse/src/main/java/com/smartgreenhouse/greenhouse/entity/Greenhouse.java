@@ -48,9 +48,4 @@ public class Greenhouse {
     @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sensor> sensors = new ArrayList<>();
 
-    public Optional<Sensor> getMoistureSensor() {
-        return sensors.stream()
-                .filter(s -> s.getSensorType() == SensorType.SOIL_MOISTURE && s.getIsActive())
-                .findFirst();
-    }
 }

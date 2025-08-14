@@ -4,6 +4,8 @@ import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
+import com.smartgreenhouse.greenhouse.entity.Sensor;
+import com.smartgreenhouse.greenhouse.enums.SensorType;
 import com.smartgreenhouse.greenhouse.exceptions.NameAlreadyExistsException;
 import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
 import com.smartgreenhouse.greenhouse.repository.GreenhouseRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,6 +71,13 @@ public class GreenhouseServiceImpl implements GreenhouseService {
             throw new ObjectNotFoundException("Greenhouse not found with ID: " + id);
         }
         greenhouseRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Sensor> findActiveMoistureSensor(Greenhouse greenhouse) {
+        return greenhouse.getSensors().stream()
+                .filter(s -> s.getSensorType() == SensorType.SOIL_MOISTURE && s.getIsActive())
+                .findFirst();
     }
 
     private Greenhouse getGreenhouseOrThrow(Long id) {

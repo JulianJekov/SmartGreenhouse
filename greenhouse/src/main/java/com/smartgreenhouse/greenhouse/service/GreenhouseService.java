@@ -4,8 +4,11 @@ package com.smartgreenhouse.greenhouse.service;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
+import com.smartgreenhouse.greenhouse.entity.Greenhouse;
+import com.smartgreenhouse.greenhouse.entity.Sensor;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GreenhouseService {
     GreenhouseDTO getGreenhouseById(Long id);
@@ -17,4 +20,6 @@ public interface GreenhouseService {
     GreenhouseDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto);
 
     void deleteGreenhouse(Long id);
+
+    Optional<Sensor> findActiveMoistureSensor(Greenhouse greenhouse);
 }
