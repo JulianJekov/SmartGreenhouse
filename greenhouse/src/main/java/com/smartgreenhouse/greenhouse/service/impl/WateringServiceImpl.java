@@ -42,15 +42,19 @@ public class WateringServiceImpl implements WateringService {
 
         if (success) {
 
-            CreateWateringLogDTO createWateringLogDTO = new CreateWateringLogDTO();
-            createWateringLogDTO.setWaterAmount(amount);
-            createWateringLogDTO.setGreenhouseId(greenhouse.getId());
-            createWateringLogDTO.setWateringSource(wateringSource);
-
-            WateringLog wateringLog = wateringLogMapper.toEntity(createWateringLogDTO, greenhouse);
-            wateringLogRepository.save(wateringLog);
+            createWateringLog(greenhouse, amount, wateringSource);
         } else {
             throw new WateringFailedException("Watering failed");
         }
+    }
+
+    private void createWateringLog(Greenhouse greenhouse, Double amount, WateringSource wateringSource) {
+        CreateWateringLogDTO createWateringLogDTO = new CreateWateringLogDTO();
+        createWateringLogDTO.setWaterAmount(amount);
+        createWateringLogDTO.setGreenhouseId(greenhouse.getId());
+        createWateringLogDTO.setWateringSource(wateringSource);
+
+        WateringLog wateringLog = wateringLogMapper.toEntity(createWateringLogDTO, greenhouse);
+        wateringLogRepository.save(wateringLog);
     }
 }
