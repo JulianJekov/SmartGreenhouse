@@ -37,14 +37,4 @@ public class Sensor {
     @ManyToOne(optional = false)
     @JoinColumn(name = "greenhouse_id", nullable = false)
     private Greenhouse greenhouse;
-
-    @Transient
-    private Double currentValue;
-
-    public Double getCurrentValue() {
-        if (isActive) {
-            this.currentValue = minThreshold + (Math.random() * (maxThreshold - minThreshold));
-        }
-        return currentValue;
-    }
 }
