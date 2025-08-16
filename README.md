@@ -1,46 +1,92 @@
-# Smart Greenhouse
-
-Smart Greenhouse is a Spring Boot application that simulates and manages basic watering operations in a greenhouse environment.  
-It supports both **manual watering** triggered by API requests and **automatic watering** triggered by scheduled checks of simulated moisture sensors.
+# 🌱 Smart Greenhouse (IoT Simulation with Spring Boot)
 
 ## Overview
+The **Smart Greenhouse** project is a Spring Boot application that simulates the core logic of an IoT-based greenhouse automation system.  
+It manages greenhouses, moisture sensors, and watering logic.  
+The goal is to provide a realistic backend system that can later integrate with real hardware such as **ESP32 controllers** and **MQTT brokers**.
 
-The system manages one or more greenhouses stored in a database.  
-Each greenhouse can be configured with:
+At this stage, the project runs in **simulation mode** using scheduled tasks and random sensor values. Future iterations will replace these simulations with actual IoT devices.
 
-- A moisture threshold value.
-- An optional simulated moisture sensor.
-- Auto-watering settings (enabled or disabled).
-- A default watering amount.
+---
 
-Watering actions are logged in a `WateringLog` table, recording the date, amount, and watering source (manual or automatic).
+## ✅ Current Functionality
 
-## Features
+### Greenhouse Management
+- Each greenhouse has:
+  - Moisture sensor (simulated)
+  - Auto-watering threshold
+  - Default watering amount
+  - Enabled/disabled auto-watering
 
-- **Manual watering** via REST endpoint.
-- **Automatic watering** using a scheduler that periodically checks moisture sensor values.
-- **Validation** to ensure a greenhouse exists before watering.
-- **Error handling** for failed watering operations.
-- **Logging of watering history** in the database.
+### Watering Logic
+- **Manual watering** (`POST /api/watering/manual`)
+- **Automatic watering** (scheduled checks every minute)
+  - Reads simulated sensor values
+  - Compares against greenhouse threshold
+  - Triggers watering if moisture is too low
+- **Watering logs** (`WateringLog` entity) keep history:
+  - Amount
+  - Source (AUTO or MANUAL)
+  - Timestamp
 
-## Tech Stack
+### Sensor Simulation
+- `SimulatedSensorReader` generates random values between sensor’s thresholds.
+- Scheduler periodically checks moisture levels.
 
-- **Java 17**
-- **Spring Boot**
-- **Spring Data JPA** (Hibernate)
-- **H2 in-memory database** (for development)
-- **Maven**
+### Error Handling
+- If watering actuator fails, a `WateringFailedException` is thrown.
+- Retry mechanism: watering is attempted up to **3 times** before failure is logged.
 
-## Project Structure
+---
 
-- `controller` – REST controllers for API endpoints.
-- `service` – Business logic for watering operations.
-- `repository` – Data access layer for entities.
-- `entity` – JPA entities such as `Greenhouse` and `WateringLog`.
-- `enums` – Enum types like `WateringSource`.
-- `exceptions` – Custom exception classes.
-- `sensors` – Simulated sensor reading logic.
+## 🚀 Planned Features
 
-## API Endpoints
+### A. Validation & Protection
+- Prevent manual watering if auto-watering is currently active (lock mechanism).
+- Validate that a greenhouse with auto-watering enabled must have an active moisture sensor.
 
-### Manual Watering
+### B. History & Statistics
+- Store periodic sensor readings in a new `SensorReading` table.
+- REST endpoints for:
+  - Moisture history (e.g. last 24 hours)
+  - Watering history with filters (date, source)
+
+### C. Multi-user Support
+- Assign each greenhouse an **owner** (`User` entity).
+- Ensure API requests only allow access to the owner’s greenhouses.
+
+### D. IoT Integration
+The project is designed to integrate with **real hardware**:
+- **ESP32 microcontrollers** connected to:
+  - Moisture sensors
+  - Pumps/valves
+- **MQTT broker** (e.g. Mosquitto) for communication:
+  - ESP32 → publishes sensor readings (`/greenhouse/{id}/sensor/moisture`)
+  - Backend → subscribes and saves data
+  - Backend → publishes actuator commands (`/greenhouse/{id}/actuator/watering`)
+  - ESP32 → subscribes and executes watering
+- Until real devices are connected, all readings and actuations are simulated in Java.
+
+### E. Frontend Integration
+- Planned REST API for a **Vue.js / React frontend**:
+  - Dashboard for real-time sensor readings
+  - History graphs (moisture, watering)
+  - Manual watering controls
+
+---
+
+## 🛠️ Tech Stack
+- **Backend:** Java 17, Spring Boot
+- **Database:** MySQL
+- **ORM:** Hibernate / Spring Data JPA
+- **IoT Simulation:** Scheduled tasks + random values
+- **Planned IoT Integration:** MQTT (Eclipse Paho), ESP32 devices
+- **Build Tool:** Maven
+
+---
+
+## 📦 Installation & Running
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/JulianJekov/SmartGreenhouse.git
