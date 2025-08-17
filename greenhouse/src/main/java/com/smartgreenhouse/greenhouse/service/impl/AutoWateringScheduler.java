@@ -30,7 +30,8 @@ public class AutoWateringScheduler {
     public void checkAndWater() {
         greenhouseRepository.findByAutoWateringEnabledTrue().forEach(greenhouse -> {
             greenhouseService.findActiveMoistureSensor(greenhouse).ifPresent(moistureSensor -> {
-                if (sensorReader.readValue(moistureSensor) < greenhouse.getMoistureThreshold()) {
+                double moistureValue = sensorReader.readValue(moistureSensor);
+                if (moistureValue < greenhouse.getMoistureThreshold()) {
                     wateringService.waterGreenhouse(
                             greenhouse.getId(),
                             greenhouse.getDefaultWateringAmount(),
