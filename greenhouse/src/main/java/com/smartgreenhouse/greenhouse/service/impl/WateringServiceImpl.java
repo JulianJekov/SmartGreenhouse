@@ -21,6 +21,7 @@ public class WateringServiceImpl implements WateringService {
     private final GreenhouseRepository greenhouseRepository;
     private final WateringLogMapper wateringLogMapper;
     private final SimulatedWateringActuator wateringActuator;
+    private final Map<Long, Boolean> wateringLocks = new ConcurrentHashMap<>();
 
     public WateringServiceImpl(WateringLogRepository wateringLogRepository,
                                GreenhouseRepository greenhouseRepository,
@@ -36,8 +37,15 @@ public class WateringServiceImpl implements WateringService {
     @Transactional
     public void waterGreenhouse(Long greenhouseId, Double amount, WateringSource wateringSource) {
         Greenhouse greenhouse = loadGreenhouseOrThrow(greenhouseId);
+        checkAndAcquireLock(greenhouseId);
 
         boolean success = wateringActuator.activateWatering(greenhouseId, amount);
+    private void checkAndAcquireLock(Long greenhouseId) {
+        if (wateringLocks.getOrDefault(greenhouseId, false)) {
+            throw new AlreadyWateringException("Greenhouse " + greenhouseId + " is already being watered.");
+        }
+        wateringLocks.put(greenhouseId, true);
+    }
 
         if (success) {
     private Greenhouse loadGreenhouseOrThrow(Long id) {
