@@ -35,12 +35,15 @@ public class WateringServiceImpl implements WateringService {
     @Override
     @Transactional
     public void waterGreenhouse(Long greenhouseId, Double amount, WateringSource wateringSource) {
-        Greenhouse greenhouse = greenhouseRepository.findById(greenhouseId)
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + greenhouseId));
+        Greenhouse greenhouse = loadGreenhouseOrThrow(greenhouseId);
 
         boolean success = wateringActuator.activateWatering(greenhouseId, amount);
 
         if (success) {
+    private Greenhouse loadGreenhouseOrThrow(Long id) {
+        return greenhouseRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
+    }
 
             createWateringLog(greenhouse, amount, wateringSource);
         } else {
