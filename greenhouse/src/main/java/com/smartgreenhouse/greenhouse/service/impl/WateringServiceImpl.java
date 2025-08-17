@@ -1,5 +1,6 @@
 package com.smartgreenhouse.greenhouse.service.impl;
 
+import com.smartgreenhouse.greenhouse.exceptions.AlreadyWateringException;
 import com.smartgreenhouse.greenhouse.simulation.SimulatedWateringActuator;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.CreateWateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
@@ -46,6 +47,11 @@ public class WateringServiceImpl implements WateringService {
         checkAndAcquireLock(greenhouseId);
         try {
             performWatering(greenhouse, amount, wateringSource);
+        } finally {
+            releaseLock(greenhouseId);
+        }
+
+    }
 
     private void checkAndAcquireLock(Long greenhouseId) {
         if (wateringLocks.getOrDefault(greenhouseId, false)) {
@@ -78,17 +84,14 @@ public class WateringServiceImpl implements WateringService {
         if (success) {
             createWateringLog(greenhouse, amount, wateringSource);
         } else {
-            throw new WateringFailedException("Watering failed");
             throw new WateringFailedException
                     ("Watering failed after " + attempts + " attempts for greenhouse " + greenhouse.getId());
         }
     }
 
-    private void createWateringLog(Greenhouse greenhouse, Double amount, WateringSource wateringSource) {
-        CreateWateringLogDTO createWateringLogDTO = new CreateWateringLogDTO();
-        createWateringLogDTO.setWaterAmount(amount);
-        createWateringLogDTO.setGreenhouseId(greenhouse.getId());
-        createWateringLogDTO.setWateringSource(wateringSource);
+    private void releaseLock(Long greenhouseId) {
+        wateringLocks.put(greenhouseId, false);
+    }
 
         WateringLog wateringLog = wateringLogMapper.toEntity(createWateringLogDTO, greenhouse);
         wateringLogRepository.save(wateringLog);
