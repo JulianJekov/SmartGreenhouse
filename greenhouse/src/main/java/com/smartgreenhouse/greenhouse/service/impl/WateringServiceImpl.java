@@ -93,6 +93,11 @@ public class WateringServiceImpl implements WateringService {
         wateringLocks.put(greenhouseId, false);
     }
 
+    private void createWateringLog(Greenhouse greenhouse, Double amount, WateringSource wateringSource) {
+        if (amount == null ||  amount <= 0) {
+            throw new IllegalArgumentException("Water amount must be greater than zero");
+        }
+        CreateWateringLogDTO createWateringLogDTO = wateringLogMapper.toCreateDto(amount, greenhouse.getId(), wateringSource);
         WateringLog wateringLog = wateringLogMapper.toEntity(createWateringLogDTO, greenhouse);
         wateringLogRepository.save(wateringLog);
     }
