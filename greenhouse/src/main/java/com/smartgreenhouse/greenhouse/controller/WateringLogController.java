@@ -27,7 +27,7 @@ public class WateringLogController {
 
     @GetMapping
     public ResponseEntity<Page<WateringLogDTO>> getAllWateringLogs(@RequestParam(defaultValue = "0") int page,
-                                                                   @RequestParam(defaultValue = "10") int size){
+                                                                   @RequestParam(defaultValue = "10") int size) {
         Page<WateringLogDTO> allWateringLogs = wateringLogService.getAllWateringLogs(page, size);
         return ResponseEntity.ok(allWateringLogs);
     }
