@@ -4,6 +4,7 @@ import com.smartgreenhouse.greenhouse.dto.wateringLog.CreateWateringLogDTO;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.WateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.WateringLog;
+import com.smartgreenhouse.greenhouse.enums.WateringSource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,6 +27,14 @@ public class WateringLogMapper {
         wateringLog.setWateringSource(dto.getWateringSource());
         wateringLog.setGreenhouse(greenhouse);
         return wateringLog;
+    }
+
+    public CreateWateringLogDTO toCreateDto(Double amount, Long greenhouseId, WateringSource wateringSource) {
+        CreateWateringLogDTO dto = new CreateWateringLogDTO();
+        dto.setWaterAmount(amount);
+        dto.setGreenhouseId(greenhouseId);
+        dto.setWateringSource(wateringSource);
+        return dto;
     }
 
 }
