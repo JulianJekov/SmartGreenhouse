@@ -14,8 +14,14 @@ import com.smartgreenhouse.greenhouse.util.wateringLogMapper.WateringLogMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 public class WateringServiceImpl implements WateringService {
+
+    private static final int MAX_ATTEMPTS = 3;
+    private static final long RETRY_DELAY_MS = 2000;
 
     private final WateringLogRepository wateringLogRepository;
     private final GreenhouseRepository greenhouseRepository;
@@ -38,8 +44,9 @@ public class WateringServiceImpl implements WateringService {
     public void waterGreenhouse(Long greenhouseId, Double amount, WateringSource wateringSource) {
         Greenhouse greenhouse = loadGreenhouseOrThrow(greenhouseId);
         checkAndAcquireLock(greenhouseId);
+        try {
+            performWatering(greenhouse, amount, wateringSource);
 
-        boolean success = wateringActuator.activateWatering(greenhouseId, amount);
     private void checkAndAcquireLock(Long greenhouseId) {
         if (wateringLocks.getOrDefault(greenhouseId, false)) {
             throw new AlreadyWateringException("Greenhouse " + greenhouseId + " is already being watered.");
@@ -47,15 +54,33 @@ public class WateringServiceImpl implements WateringService {
         wateringLocks.put(greenhouseId, true);
     }
 
-        if (success) {
     private Greenhouse loadGreenhouseOrThrow(Long id) {
         return greenhouseRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
     }
 
+    private void performWatering(Greenhouse greenhouse, Double amount, WateringSource wateringSource) {
+        boolean success = false;
+        int attempts = 0;
+        while (!success && attempts < MAX_ATTEMPTS) {
+            attempts++;
+            success = wateringActuator.activateWatering(greenhouse.getId(), amount);
+
+            if (!success && attempts < MAX_ATTEMPTS) {
+                try {
+                    Thread.sleep(RETRY_DELAY_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        if (success) {
             createWateringLog(greenhouse, amount, wateringSource);
         } else {
             throw new WateringFailedException("Watering failed");
+            throw new WateringFailedException
+                    ("Watering failed after " + attempts + " attempts for greenhouse " + greenhouse.getId());
         }
     }
 
