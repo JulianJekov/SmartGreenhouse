@@ -1,6 +1,7 @@
 package com.smartgreenhouse.greenhouse.service.impl;
 
 import com.smartgreenhouse.greenhouse.exceptions.AlreadyWateringException;
+import com.smartgreenhouse.greenhouse.exceptions.InvalidWaterAmountException;
 import com.smartgreenhouse.greenhouse.simulation.SimulatedWateringActuator;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.CreateWateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
@@ -12,6 +13,8 @@ import com.smartgreenhouse.greenhouse.repository.GreenhouseRepository;
 import com.smartgreenhouse.greenhouse.repository.WateringLogRepository;
 import com.smartgreenhouse.greenhouse.service.WateringService;
 import com.smartgreenhouse.greenhouse.util.wateringLogMapper.WateringLogMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class WateringServiceImpl implements WateringService {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(WateringServiceImpl.class.getName());
     private static final int MAX_ATTEMPTS = 3;
     private static final long RETRY_DELAY_MS = 2000;
 
@@ -93,6 +97,7 @@ public class WateringServiceImpl implements WateringService {
 
         if (success) {
             createWateringLog(greenhouse, amount, wateringSource);
+            LOGGER.info("Successfully {} watered greenhouse with ID: {} from {} attempt", wateringSource, greenhouse.getId(), attempts);
         } else {
             throw new WateringFailedException
                     ("Watering failed after " + attempts + " attempts for greenhouse " + greenhouse.getId());
@@ -104,11 +109,9 @@ public class WateringServiceImpl implements WateringService {
     }
 
     private void createWateringLog(Greenhouse greenhouse, Double amount, WateringSource wateringSource) {
-        if (amount == null ||  amount <= 0) {
-            throw new IllegalArgumentException("Water amount must be greater than zero");
-        }
         CreateWateringLogDTO createWateringLogDTO = wateringLogMapper.toCreateDto(amount, greenhouse.getId(), wateringSource);
         WateringLog wateringLog = wateringLogMapper.toEntity(createWateringLogDTO, greenhouse);
         wateringLogRepository.save(wateringLog);
+        LOGGER.info("Successfully created watering log with ID: {}", wateringLog.getId());
     }
 }
