@@ -10,9 +10,12 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
+@NamedEntityGraph(
+        name = "Greenhouse.withSensors",
+        attributeNodes = @NamedAttributeNode("sensors")
+)
 @Table
 @Getter
 @Setter
