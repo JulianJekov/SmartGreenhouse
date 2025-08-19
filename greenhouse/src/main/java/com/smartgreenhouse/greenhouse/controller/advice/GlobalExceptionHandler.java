@@ -2,6 +2,8 @@ package com.smartgreenhouse.greenhouse.controller.advice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.smartgreenhouse.greenhouse.enums.SensorType;
+import com.smartgreenhouse.greenhouse.exceptions.AlreadyWateringException;
+import com.smartgreenhouse.greenhouse.exceptions.InvalidWaterAmountException;
 import com.smartgreenhouse.greenhouse.exceptions.NameAlreadyExistsException;
 import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
 import org.slf4j.Logger;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -64,5 +67,29 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid sensor type. Valid values are " + enumValue);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Malformed JSON request");
+    }
+
+    @ExceptionHandler(InvalidWaterAmountException.class)
+    public ResponseEntity<String> handleInvalidWaterAmountException(InvalidWaterAmountException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyWateringException.class)
+    public ResponseEntity<String> handleAlreadyWateringException(AlreadyWateringException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler({
+            MissingServletRequestParameterException.class,
+            IllegalArgumentException.class
+    })
+    public ResponseEntity<String> handleBadRequests(Exception ex) {
+        String message = ex instanceof MissingServletRequestParameterException
+                ? String.format("%s parameter is required",
+                ((MissingServletRequestParameterException)ex).getParameterName())
+                : ex.getMessage();
+
+        return ResponseEntity.badRequest()
+                .body(message);
     }
 }
