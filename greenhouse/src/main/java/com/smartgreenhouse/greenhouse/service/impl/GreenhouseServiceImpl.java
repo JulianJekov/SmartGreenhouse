@@ -74,6 +74,7 @@ public class GreenhouseServiceImpl implements GreenhouseService {
     }
 
     @Override
+    @Transactional
     public Optional<Sensor> findActiveMoistureSensor(Greenhouse greenhouse) {
         return greenhouse.getSensors().stream()
                 .filter(s -> s.getSensorType() == SensorType.SOIL_MOISTURE && s.getIsActive())
