@@ -1,4 +1,4 @@
 package com.smartgreenhouse.greenhouse.service;
 
-public interface SensorService {
+public interface SensorReadingService {
 }

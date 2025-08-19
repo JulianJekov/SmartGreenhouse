@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "sensor_readings")
@@ -27,3 +28,4 @@ public class SensorReading {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp = LocalDateTime.now();
+}
