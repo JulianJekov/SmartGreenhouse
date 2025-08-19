@@ -44,13 +44,23 @@ public class WateringServiceImpl implements WateringService {
     @Transactional
     public void waterGreenhouse(Long greenhouseId, Double amount, WateringSource wateringSource) {
         Greenhouse greenhouse = loadGreenhouseOrThrow(greenhouseId);
+
+        validateWaterAmount(amount);
+
         checkAndAcquireLock(greenhouseId);
+
         try {
             performWatering(greenhouse, amount, wateringSource);
         } finally {
             releaseLock(greenhouseId);
         }
 
+    }
+
+    private static void validateWaterAmount(Double amount) {
+        if (amount == null || amount <= 0) {
+            throw new InvalidWaterAmountException("Water amount must be positive");
+        }
     }
 
     private void checkAndAcquireLock(Long greenhouseId) {
