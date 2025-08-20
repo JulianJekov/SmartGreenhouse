@@ -28,7 +28,7 @@ public class AutoWateringScheduler {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 30000) // 5 minutes
+    @Scheduled(fixedRate = 300000) // 5 minutes
     public void checkAndWater() {
         greenhouseRepository.findByAutoWateringEnabledTrue()
                 .forEach(greenhouse -> {
