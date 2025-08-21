@@ -17,4 +17,6 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
             (Long sensorId, LocalDateTime from, LocalDateTime to);
 
     List<SensorReading> findAllBySensorIdOrderByTimestampAsc(Long sensorId);
+
+    List<SensorReading> findTop10BySensorIdOrderByTimestamp(Long sensorId);
 }
