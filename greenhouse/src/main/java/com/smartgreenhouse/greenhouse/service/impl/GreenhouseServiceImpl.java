@@ -3,6 +3,7 @@ package com.smartgreenhouse.greenhouse.service.impl;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.Sensor;
 import com.smartgreenhouse.greenhouse.enums.SensorType;
@@ -11,6 +12,7 @@ import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
 import com.smartgreenhouse.greenhouse.repository.GreenhouseRepository;
 import com.smartgreenhouse.greenhouse.service.GreenhouseService;
 import com.smartgreenhouse.greenhouse.util.greenhouseMapper.GreenhouseMapper;
+import com.smartgreenhouse.greenhouse.util.sensorMapper.SensorMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +25,14 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     private final GreenhouseRepository greenhouseRepository;
     private final GreenhouseMapper greenhouseMapper;
+    private final SensorMapper sensorMapper;
 
     public GreenhouseServiceImpl(GreenhouseRepository greenhouseRepository,
-                                 GreenhouseMapper greenhouseMapper) {
+                                 GreenhouseMapper greenhouseMapper,
+                                 SensorMapper sensorMapper) {
         this.greenhouseRepository = greenhouseRepository;
         this.greenhouseMapper = greenhouseMapper;
+        this.sensorMapper = sensorMapper;
     }
 
     @Transactional(readOnly = true)
@@ -79,6 +84,14 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         return greenhouse.getSensors().stream()
                 .filter(s -> s.getSensorType() == SensorType.SOIL_MOISTURE && s.getIsActive())
                 .findFirst();
+    }
+
+    @Override
+    public List<SensorDTO> getSensorsByGreenhouseId(Long id) {
+        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+        return greenhouse.getSensors().stream()
+                .map(sensorMapper::toDto)
+                .toList();
     }
 
     private Greenhouse getGreenhouseOrThrow(Long id) {
