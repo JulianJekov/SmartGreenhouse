@@ -3,6 +3,7 @@ package com.smartgreenhouse.greenhouse.controller;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.service.GreenhouseService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,12 @@ public class GreenhouseController {
 
     public GreenhouseController(GreenhouseService greenhouseService) {
         this.greenhouseService = greenhouseService;
+    }
+
+    @GetMapping("/{id}/sensors")
+    public ResponseEntity<List<SensorDTO>> getGreenhouseSensors(@PathVariable Long id){
+        List<SensorDTO> sensorsByGreenhouseId = greenhouseService.getSensorsByGreenhouseId(id);
+        return ResponseEntity.ok(sensorsByGreenhouseId);
     }
 
     @GetMapping("/{id}")
