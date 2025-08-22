@@ -3,6 +3,7 @@ package com.smartgreenhouse.greenhouse.service;
 
 import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
@@ -25,4 +26,6 @@ public interface GreenhouseService {
     Optional<Sensor> findActiveMoistureSensor(Greenhouse greenhouse);
 
     List<SensorDTO> getSensorsByGreenhouseId(Long id);
+
+    List<GreenhouseOverviewDTO> getGreenhousesOverview();
 }

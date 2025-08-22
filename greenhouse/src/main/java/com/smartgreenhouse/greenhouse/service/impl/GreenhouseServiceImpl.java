@@ -2,6 +2,7 @@ package com.smartgreenhouse.greenhouse.service.impl;
 
 import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
@@ -91,6 +92,15 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         Greenhouse greenhouse = getGreenhouseOrThrow(id);
         return greenhouse.getSensors().stream()
                 .map(sensorMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<GreenhouseOverviewDTO> getGreenhousesOverview() {
+        //TODO: when add users change it find by user id
+        List<Greenhouse> allGreenhouses = greenhouseRepository.findAll();
+        return allGreenhouses.stream()
+                .map(greenhouseMapper::toOverviewDto)
                 .toList();
     }
 
