@@ -2,6 +2,7 @@ package com.smartgreenhouse.greenhouse.controller;
 
 import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.service.GreenhouseService;
@@ -20,6 +21,12 @@ public class GreenhouseController {
 
     public GreenhouseController(GreenhouseService greenhouseService) {
         this.greenhouseService = greenhouseService;
+    }
+
+    @GetMapping("/overview")
+    public ResponseEntity<List<GreenhouseOverviewDTO>> getGreenhousesOverview(){
+        List<GreenhouseOverviewDTO> greenhousesOverview = greenhouseService.getGreenhousesOverview();
+        return ResponseEntity.ok(greenhousesOverview);
     }
 
     @GetMapping("/{id}/sensors")
