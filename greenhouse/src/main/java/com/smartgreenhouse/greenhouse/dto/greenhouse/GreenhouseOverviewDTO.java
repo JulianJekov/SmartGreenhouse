@@ -16,5 +16,5 @@ public class GreenhouseOverviewDTO {
     private Double currentTemperature;
     private Double currentMoisture;
     private Boolean autoWateringEnabled;
-    private Integer activeSensorCount;
+    private Long activeSensorCount;
 }
