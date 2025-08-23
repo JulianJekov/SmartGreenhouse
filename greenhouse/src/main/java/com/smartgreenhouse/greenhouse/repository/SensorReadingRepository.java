@@ -2,6 +2,8 @@ package com.smartgreenhouse.greenhouse.repository;
 
 import com.smartgreenhouse.greenhouse.entity.SensorReading;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -19,4 +21,27 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     List<SensorReading> findAllBySensorIdOrderByTimestampAsc(Long sensorId);
 
     List<SensorReading> findTop10BySensorIdOrderByTimestamp(Long sensorId);
+
+    @Query("""
+            SELECT r
+            FROM SensorReading r
+            WHERE r.timestamp = (
+            SELECT MAX(r2.timestamp)
+            FROM SensorReading r2
+            WHERE r2.sensor.id = r.sensor.id
+            )
+            """)
+    List<SensorReading> findLatestReadingsForAllSensors();
+
+    @Query("""
+                SELECT r
+                FROM SensorReading r
+                WHERE r.sensor.id IN :sensorIds
+                  AND r.timestamp = (
+                      SELECT MAX(r2.timestamp)
+                      FROM SensorReading r2
+                      WHERE r2.sensor.id = r.sensor.id
+                  )
+            """)
+    List<SensorReading> findLatestReadingsForSensors(@Param("sensorIds") List<Long> sensorIds);
 }
