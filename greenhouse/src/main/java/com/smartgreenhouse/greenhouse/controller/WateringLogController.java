@@ -39,4 +39,5 @@ public class WateringLogController {
         Page<WateringLogDTO> wateringLogByGreenhouseId = wateringLogService.getWateringLogByGreenhouseId(id, page, size);
         return ResponseEntity.ok(wateringLogByGreenhouseId);
     }
+    //TODO move this to greenhouse
 }
