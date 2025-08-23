@@ -6,27 +6,14 @@ import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.WateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
-import com.smartgreenhouse.greenhouse.entity.Sensor;
-import com.smartgreenhouse.greenhouse.entity.SensorReading;
 import com.smartgreenhouse.greenhouse.entity.WateringLog;
-import com.smartgreenhouse.greenhouse.enums.SensorType;
-import com.smartgreenhouse.greenhouse.repository.SensorReadingRepository;
-import com.smartgreenhouse.greenhouse.simulation.SimulatedSensorReader;
 import com.smartgreenhouse.greenhouse.util.sensorMapper.SensorMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class GreenhouseMapper {
-    private final SensorReadingRepository sensorReadingRepository;
-    private final SimulatedSensorReader simulatedSensorReader;
-
-    public GreenhouseMapper(SensorReadingRepository sensorReadingRepository, SimulatedSensorReader simulatedSensorReader) {
-        this.sensorReadingRepository = sensorReadingRepository;
-        this.simulatedSensorReader = simulatedSensorReader;
-    }
 
     public GreenhouseDTO toDto(Greenhouse greenhouse) {
         GreenhouseDTO dto = new GreenhouseDTO();
@@ -78,29 +65,8 @@ public class GreenhouseMapper {
         GreenhouseOverviewDTO dto = new GreenhouseOverviewDTO();
         dto.setId(greenhouse.getId());
         dto.setName(greenhouse.getName());
-        dto.setCurrentTemperature(getSensorValue(greenhouse, SensorType.TEMPERATURE));
-        dto.setCurrentMoisture(getSensorValue(greenhouse, SensorType.SOIL_MOISTURE));
         dto.setAutoWateringEnabled(greenhouse.getAutoWateringEnabled());
-        dto.setActiveSensorCount(countActiveSensors(greenhouse));
         return dto;
-    }
-
-    private int countActiveSensors(Greenhouse greenhouse) {
-        return (int) greenhouse.getSensors().stream().filter(Sensor::getIsActive).count();
-    }
-
-    private Double getSensorValue(Greenhouse greenhouse, SensorType sensorType) {
-        Optional<Sensor> optionalSensor = greenhouse.getSensors()
-                .stream()
-                .filter(s -> s.getSensorType().equals(sensorType) && s.getIsActive())
-                .findFirst();
-        if (optionalSensor.isEmpty()) {
-            return null;
-        }
-        Sensor sensor = optionalSensor.get();
-
-        Optional<SensorReading> sensorReading = sensorReadingRepository.findTopBySensorIdOrderByTimestampDesc(sensor.getId());
-        return sensorReading.map(SensorReading::getValue).orElseGet(() -> simulatedSensorReader.readValue(sensor));
     }
 
     private WateringLogDTO toWateringLogDto(WateringLog wateringLog) {
