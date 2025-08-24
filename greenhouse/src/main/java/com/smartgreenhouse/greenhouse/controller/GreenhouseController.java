@@ -1,9 +1,6 @@
 package com.smartgreenhouse.greenhouse.controller;
 
-import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.greenhouse.*;
 import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.service.GreenhouseService;
 import jakarta.validation.Valid;
@@ -21,6 +18,12 @@ public class GreenhouseController {
 
     public GreenhouseController(GreenhouseService greenhouseService) {
         this.greenhouseService = greenhouseService;
+    }
+
+    @GetMapping("/{id}/settings")
+    public ResponseEntity<GreenhouseSettingsDTO> getGreenhouseSettings(@PathVariable Long id){
+        GreenhouseSettingsDTO settingsDTO = greenhouseService.getSettings(id);
+        return ResponseEntity.ok(settingsDTO);
     }
 
     @GetMapping("/overview")
