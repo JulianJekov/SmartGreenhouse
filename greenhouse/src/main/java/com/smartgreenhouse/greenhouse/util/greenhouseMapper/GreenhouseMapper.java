@@ -74,6 +74,12 @@ public class GreenhouseMapper {
         return dto;
     }
 
+    public void updateSettings(GreenhouseSettingsDTO greenhouseSettingsDTO, Greenhouse greenhouse) {
+        greenhouse.setMoistureThreshold(greenhouseSettingsDTO.getMoistureThreshold());
+        greenhouse.setDefaultWateringAmount(greenhouseSettingsDTO.getDefaultWaterAmount());
+        greenhouse.setAutoWateringEnabled(greenhouseSettingsDTO.getAutoWateringEnabled());
+    }
+
     private WateringLogDTO toWateringLogDto(WateringLog wateringLog) {
         WateringLogDTO dto = new WateringLogDTO();
         dto.setId(wateringLog.getId());
