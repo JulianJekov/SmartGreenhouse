@@ -126,6 +126,15 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         return greenhouseMapper.toSettingsDto(greenhouse);
     }
 
+    @Transactional
+    @Override
+    public GreenhouseDTO updateSettings(Long id, GreenhouseSettingsDTO settingsDTO) {
+        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+        greenhouseMapper.updateSettings(settingsDTO, greenhouse);
+        Greenhouse updated = greenhouseRepository.save(greenhouse);
+        return greenhouseMapper.toDto(updated);
+    }
+
     private GreenhouseOverviewDTO buildOverviewDTO(Greenhouse greenhouse, Map<Long, Double> latestValueMap) {
         Double currentTemperature = getLatestValue(greenhouse, SensorType.TEMPERATURE, latestValueMap);
         Double currentMoisture = getLatestValue(greenhouse, SensorType.SOIL_MOISTURE, latestValueMap);

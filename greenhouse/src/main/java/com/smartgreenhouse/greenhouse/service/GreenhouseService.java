@@ -28,4 +28,6 @@ public interface GreenhouseService {
 
     GreenhouseSettingsDTO getSettings(Long id);
 
+    GreenhouseDTO updateSettings(Long id, GreenhouseSettingsDTO settingsDTO);
+
 }
