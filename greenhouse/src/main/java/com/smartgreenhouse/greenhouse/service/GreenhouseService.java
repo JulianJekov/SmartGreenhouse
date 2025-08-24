@@ -30,4 +30,5 @@ public interface GreenhouseService {
 
     GreenhouseDTO updateSettings(Long id, GreenhouseSettingsDTO settingsDTO);
 
+    void toggleAutoWatering(Long id);
 }
