@@ -26,6 +26,12 @@ public class GreenhouseController {
         return ResponseEntity.ok(settingsDTO);
     }
 
+    @PutMapping("/{id}/settings")
+    public ResponseEntity<GreenhouseDTO> updateSettings(@PathVariable Long id, @Valid @RequestBody GreenhouseSettingsDTO settingsDTO){
+        GreenhouseDTO greenhouseDTO = greenhouseService.updateSettings(id, settingsDTO);
+        return ResponseEntity.ok(greenhouseDTO);
+    }
+
     @GetMapping("/overview")
     public ResponseEntity<List<GreenhouseOverviewDTO>> getGreenhousesOverview(){
         List<GreenhouseOverviewDTO> greenhousesOverview = greenhouseService.getGreenhousesOverview();
