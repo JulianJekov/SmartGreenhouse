@@ -1,9 +1,6 @@
 package com.smartgreenhouse.greenhouse.util.greenhouseMapper;
 
-import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.greenhouse.*;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.WateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.WateringLog;
@@ -65,6 +62,14 @@ public class GreenhouseMapper {
         GreenhouseOverviewDTO dto = new GreenhouseOverviewDTO();
         dto.setId(greenhouse.getId());
         dto.setName(greenhouse.getName());
+        dto.setAutoWateringEnabled(greenhouse.getAutoWateringEnabled());
+        return dto;
+    }
+
+    public GreenhouseSettingsDTO toSettingsDto(Greenhouse greenhouse) {
+        GreenhouseSettingsDTO dto = new GreenhouseSettingsDTO();
+        dto.setMoistureThreshold(greenhouse.getMoistureThreshold());
+        dto.setDefaultWaterAmount(greenhouse.getDefaultWateringAmount());
         dto.setAutoWateringEnabled(greenhouse.getAutoWateringEnabled());
         return dto;
     }
