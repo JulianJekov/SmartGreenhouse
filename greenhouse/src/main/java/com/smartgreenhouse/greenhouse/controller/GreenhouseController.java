@@ -26,6 +26,12 @@ public class GreenhouseController {
         return ResponseEntity.ok(settingsDTO);
     }
 
+    @PatchMapping("/{id}/auto-watering")
+    public ResponseEntity<Void> toggleAutoWatering(@PathVariable Long id){
+        greenhouseService.toggleAutoWatering(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}/settings")
     public ResponseEntity<GreenhouseDTO> updateSettings(@PathVariable Long id, @Valid @RequestBody GreenhouseSettingsDTO settingsDTO){
         GreenhouseDTO greenhouseDTO = greenhouseService.updateSettings(id, settingsDTO);
