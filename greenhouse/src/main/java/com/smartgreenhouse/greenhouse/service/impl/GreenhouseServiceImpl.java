@@ -1,9 +1,6 @@
 package com.smartgreenhouse.greenhouse.service.impl;
 
-import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.greenhouse.*;
 import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.Sensor;
@@ -84,14 +81,15 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         greenhouseRepository.deleteById(id);
     }
 
-    @Override
     @Transactional
+    @Override
     public Optional<Sensor> findActiveMoistureSensor(Greenhouse greenhouse) {
         return greenhouse.getSensors().stream()
                 .filter(s -> s.getSensorType() == SensorType.SOIL_MOISTURE && s.getIsActive())
                 .findFirst();
     }
 
+    @Transactional
     @Override
     public List<SensorDTO> getSensorsByGreenhouseId(Long id) {
         Greenhouse greenhouse = getGreenhouseOrThrow(id);
@@ -100,6 +98,7 @@ public class GreenhouseServiceImpl implements GreenhouseService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public List<GreenhouseOverviewDTO> getGreenhousesOverview() {
         //TODO: when add users change it find by user id
@@ -118,6 +117,13 @@ public class GreenhouseServiceImpl implements GreenhouseService {
         return allGreenhouses.stream()
                 .map(g -> buildOverviewDTO(g, latestValueMap))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public GreenhouseSettingsDTO getSettings(Long id) {
+        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+        return greenhouseMapper.toSettingsDto(greenhouse);
     }
 
     private GreenhouseOverviewDTO buildOverviewDTO(Greenhouse greenhouse, Map<Long, Double> latestValueMap) {

@@ -1,10 +1,7 @@
 package com.smartgreenhouse.greenhouse.service;
 
 
-import com.smartgreenhouse.greenhouse.dto.greenhouse.CreateGreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.GreenhouseOverviewDTO;
-import com.smartgreenhouse.greenhouse.dto.greenhouse.UpdateGreenhouseDTO;
+import com.smartgreenhouse.greenhouse.dto.greenhouse.*;
 import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.Sensor;
@@ -28,4 +25,7 @@ public interface GreenhouseService {
     List<SensorDTO> getSensorsByGreenhouseId(Long id);
 
     List<GreenhouseOverviewDTO> getGreenhousesOverview();
+
+    GreenhouseSettingsDTO getSettings(Long id);
+
 }
