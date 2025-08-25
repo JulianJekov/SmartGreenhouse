@@ -1,7 +1,6 @@
 package com.smartgreenhouse.greenhouse.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.smartgreenhouse.greenhouse.enums.SensorType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,5 +49,9 @@ public class Greenhouse {
 
     @OneToMany(mappedBy = "greenhouse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sensor> sensors = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
 }
