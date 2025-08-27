@@ -1,0 +1,7 @@
+package com.smartgreenhouse.greenhouse.exceptions;
+
+public class EmailAlreadyExistsException extends RuntimeException {
+    public EmailAlreadyExistsException(String message) {
+        super(message);
+    }
+}
