@@ -15,12 +15,13 @@ public class SensorReadingMapper {
     public SensorReadingDTO toDto(SensorReading sensorReading){
         SensorReadingDTO sensorReadingDTO = new SensorReadingDTO();
         sensorReadingDTO.setId(sensorReading.getId());
-        sensorReadingDTO.setSensorId(sensorReadingDTO.getSensorId());
+        sensorReadingDTO.setSensorId(sensorReading.getSensor().getId());
         sensorReadingDTO.setTimestamp(sensorReading.getTimestamp());
         sensorReadingDTO.setValue(sensorReading.getValue());
         sensorReadingDTO.setSensorUnit(sensorReading.getSensor().getUnit());
         sensorReadingDTO.setSensorType(sensorReading.getSensor().getSensorType());
         sensorReadingDTO.setGreenhouseId(sensorReading.getSensor().getGreenhouse().getId());
+        sensorReadingDTO.setGreenhouseName(sensorReading.getSensor().getGreenhouse().getName());
         return sensorReadingDTO;
     }
 
