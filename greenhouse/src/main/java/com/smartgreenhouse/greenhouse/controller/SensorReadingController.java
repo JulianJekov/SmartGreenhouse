@@ -29,7 +29,7 @@ public class SensorReadingController {
         return ResponseEntity.ok(sensorReading);
     }
 
-    @GetMapping("latest")
+    @GetMapping("/latest")
     public ResponseEntity<SensorReadingDTO> getLatestSensorReadings(@RequestParam Long sensorId) {
         SensorReadingDTO latestSensorReading = sensorReadingService.getLatestSensorReading(sensorId);
         return ResponseEntity.ok(latestSensorReading);
