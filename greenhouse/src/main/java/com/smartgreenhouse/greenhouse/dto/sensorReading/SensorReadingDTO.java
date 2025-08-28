@@ -14,10 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SensorReadingDTO {
     private Long id;
-    private Long sensorId;
-    private Long greenhouseId;
-    private String sensorUnit;
-    private SensorType sensorType;
     private Double value;
     private LocalDateTime timestamp;
+    private Long sensorId;
+    private SensorType sensorType;
+    private String sensorUnit;
+    private Long greenhouseId;
+    private String greenhouseName;
 }
