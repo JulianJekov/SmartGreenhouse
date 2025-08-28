@@ -86,6 +86,8 @@ public class GreenhouseMapper {
         dto.setTimestamp(wateringLog.getTimestamp());
         dto.setWaterAmount(wateringLog.getWaterAmount());
         dto.setGreenhouseId(wateringLog.getGreenhouse().getId());
+        dto.setGreenhouseName(wateringLog.getGreenhouse().getName());
+        dto.setWateringSource(wateringLog.getWateringSource());
         return dto;
     }
 }
