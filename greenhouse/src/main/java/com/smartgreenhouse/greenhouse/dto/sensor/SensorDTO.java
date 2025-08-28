@@ -16,7 +16,6 @@ public class SensorDTO {
     private String unit;
     private Double minThreshold;
     private Double maxThreshold;
-    private Double currentValue;
     private Boolean isActive;
     private Long greenhouseId;
     private String greenhouseName;
