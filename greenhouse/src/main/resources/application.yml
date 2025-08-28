@@ -23,3 +23,9 @@ mqtt:
     broker-url: tcp://localhost:1883
     client-id: greenhouse-app
     topic-prefix: greenhouse/
+
+jwt:
+    auth:
+        app: "SmartGreenhouse"
+        secret_key: ${JWT_SECRET}
+        expiration: 86400
