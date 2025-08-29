@@ -14,7 +14,7 @@ public interface GreenhouseService {
 
     List<GreenhouseDTO> getAllGreenhouses();
 
-    GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto);
+    GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto, String email);
 
     GreenhouseDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto);
 

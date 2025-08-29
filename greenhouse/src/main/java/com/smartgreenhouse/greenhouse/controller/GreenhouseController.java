@@ -6,6 +6,8 @@ import com.smartgreenhouse.greenhouse.service.GreenhouseService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,8 +65,9 @@ public class GreenhouseController {
     }
 
     @PostMapping
-    public ResponseEntity<GreenhouseDTO> createGreenhouse(@RequestBody @Valid CreateGreenhouseDTO createGreenhouseDTO) {
-        GreenhouseDTO createdGreenhouse = greenhouseService.createGreenhouse(createGreenhouseDTO);
+    public ResponseEntity<GreenhouseDTO> createGreenhouse(@RequestBody @Valid CreateGreenhouseDTO createGreenhouseDTO,
+                                                          @AuthenticationPrincipal UserDetails userDetails) {
+        GreenhouseDTO createdGreenhouse = greenhouseService.createGreenhouse(createGreenhouseDTO, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdGreenhouse);
     }
 

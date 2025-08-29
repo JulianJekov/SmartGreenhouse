@@ -5,12 +5,14 @@ import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
 import com.smartgreenhouse.greenhouse.entity.Sensor;
 import com.smartgreenhouse.greenhouse.entity.SensorReading;
+import com.smartgreenhouse.greenhouse.entity.User;
 import com.smartgreenhouse.greenhouse.enums.SensorType;
 import com.smartgreenhouse.greenhouse.exceptions.NameAlreadyExistsException;
 import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
 import com.smartgreenhouse.greenhouse.repository.GreenhouseRepository;
 import com.smartgreenhouse.greenhouse.repository.SensorReadingRepository;
 import com.smartgreenhouse.greenhouse.service.GreenhouseService;
+import com.smartgreenhouse.greenhouse.service.UserService;
 import com.smartgreenhouse.greenhouse.util.greenhouseMapper.GreenhouseMapper;
 import com.smartgreenhouse.greenhouse.util.sensorMapper.SensorMapper;
 import org.springframework.stereotype.Service;
@@ -28,14 +30,18 @@ public class GreenhouseServiceImpl implements GreenhouseService {
     private final GreenhouseMapper greenhouseMapper;
     private final SensorMapper sensorMapper;
     private final SensorReadingRepository sensorReadingRepository;
+    private final UserService userService;
 
     public GreenhouseServiceImpl(GreenhouseRepository greenhouseRepository,
                                  GreenhouseMapper greenhouseMapper,
-                                 SensorMapper sensorMapper, SensorReadingRepository sensorReadingRepository) {
+                                 SensorMapper sensorMapper,
+                                 SensorReadingRepository sensorReadingRepository,
+                                 UserService userService) {
         this.greenhouseRepository = greenhouseRepository;
         this.greenhouseMapper = greenhouseMapper;
         this.sensorMapper = sensorMapper;
         this.sensorReadingRepository = sensorReadingRepository;
+        this.userService = userService;
     }
 
     @Transactional(readOnly = true)
@@ -55,9 +61,11 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     @Transactional
     @Override
-    public GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto) {
+    public GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto, String userEmail) {
+        User user = userService.getUserByEmail(userEmail);
         throwIfDuplicatedNames(dto.getName());
         Greenhouse greenhouse = greenhouseMapper.toEntity(dto);
+        greenhouse.setUser(user);
         greenhouseRepository.save(greenhouse);
         return greenhouseMapper.toDto(greenhouse);
     }
