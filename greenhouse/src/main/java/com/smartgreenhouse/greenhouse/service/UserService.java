@@ -8,6 +8,10 @@ import com.smartgreenhouse.greenhouse.entity.User;
 
 public interface UserService {
     AuthResponse register(RegisterRequest registerRequest);
+
     AuthResponse login(LoginRequest loginRequest);
+
     UserDTO getCurrentUser(String email);
+
+    User getUserByEmail(String userEmail);
 }

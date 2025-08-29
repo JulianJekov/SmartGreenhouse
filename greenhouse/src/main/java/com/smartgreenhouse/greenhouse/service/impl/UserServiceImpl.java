@@ -24,7 +24,8 @@ public class UserServiceImpl implements UserService {
 
     public UserServiceImpl(UserRepository userRepository,
                            UserMapper userMapper,
-                           PasswordEncoder passwordEncoder, JWTHelper jWTHelper) {
+                           PasswordEncoder passwordEncoder,
+                           JWTHelper jWTHelper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
@@ -67,6 +68,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
         return userMapper.toDTO(user);
+    }
+
+    @Override
+    public User getUserByEmail(String userEmail) {
+        return userRepository.findByEmail(userEmail).orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
 
