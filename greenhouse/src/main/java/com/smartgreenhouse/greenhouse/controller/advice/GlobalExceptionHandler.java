@@ -1,11 +1,7 @@
 package com.smartgreenhouse.greenhouse.controller.advice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.smartgreenhouse.greenhouse.enums.SensorType;
-import com.smartgreenhouse.greenhouse.exceptions.AlreadyWateringException;
-import com.smartgreenhouse.greenhouse.exceptions.InvalidWaterAmountException;
-import com.smartgreenhouse.greenhouse.exceptions.NameAlreadyExistsException;
-import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
+import com.smartgreenhouse.greenhouse.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,6 +40,38 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        LOGGER.warn("Method argument type mismatch for parameter '{}': {}", ex.getName(), ex.getMessage());
+
+        String parameterName = ex.getName();
+        Object invalidValue = ex.getValue();
+        Class<?> requiredType = ex.getRequiredType();
+
+        String errorMessage;
+
+        assert requiredType != null;
+        if (Number.class.isAssignableFrom(requiredType)) {
+            errorMessage = String.format(
+                    "Invalid number format for parameter '%s': '%s'. Must be a valid number.",
+                    parameterName, invalidValue
+            );
+        } else if (requiredType.isEnum()) {
+            String enumValues = Arrays.toString(requiredType.getEnumConstants());
+            errorMessage = String.format(
+                    "Invalid enum value for parameter '%s': '%s'. Valid values are: %s",
+                    parameterName, invalidValue, enumValues
+            );
+        } else {
+            errorMessage = String.format(
+                    "Invalid format for parameter '%s': '%s'. Must be of type %s",
+                    parameterName, invalidValue, requiredType.getSimpleName()
+            );
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         LOGGER.warn("Validation failed: {}", ex.getMessage());
@@ -55,18 +84,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         Throwable rootCause = ex.getRootCause();
-        if (rootCause instanceof InvalidFormatException ife &&
-                ife.getTargetType() != null &&
-                ife.getTargetType().isEnum()) {
-            String invalidValue = ife.getValue().toString();
-            LOGGER.debug("Invalid enum value provided: {}", invalidValue);
-            String enumValue = Arrays.toString(SensorType.values());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid sensor type. Valid values are " + enumValue);
+        if (rootCause instanceof InvalidFormatException ife) {
+            if (Number.class.isAssignableFrom(ife.getTargetType())) {
+                String fieldName = ife.getPath().get(ife.getPath().size() - 1).getFieldName();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Invalid number format for field '" + fieldName + "': '" + ife.getValue() + "'. Must be a valid number.");
+            }
+            if (ife.getTargetType().isEnum()) {
+                String enumValues = Arrays.toString(ife.getTargetType().getEnumConstants());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Invalid enum value: '" + ife.getValue() + "'. Valid values are: " + enumValues);
+            }
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Malformed JSON request");
+        LOGGER.warn("Malformed JSON request: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Malformed JSON request. Please check your input data.");
     }
 
     @ExceptionHandler(InvalidWaterAmountException.class)
@@ -86,10 +122,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBadRequests(Exception ex) {
         String message = ex instanceof MissingServletRequestParameterException
                 ? String.format("%s parameter is required",
-                ((MissingServletRequestParameterException)ex).getParameterName())
+                ((MissingServletRequestParameterException) ex).getParameterName())
                 : ex.getMessage();
 
         return ResponseEntity.badRequest()
                 .body(message);
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<String> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }
