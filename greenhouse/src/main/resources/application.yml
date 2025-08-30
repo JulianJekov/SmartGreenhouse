@@ -28,4 +28,6 @@ jwt:
     auth:
         app: "SmartGreenhouse"
         secret_key: ${JWT_SECRET}
-        expiration: 86400
+        expiration: 900
+    refresh:
+        expiration: 604800000
