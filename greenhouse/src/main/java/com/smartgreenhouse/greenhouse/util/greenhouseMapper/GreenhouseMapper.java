@@ -3,6 +3,7 @@ package com.smartgreenhouse.greenhouse.util.greenhouseMapper;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.*;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.WateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
+import com.smartgreenhouse.greenhouse.entity.Sensor;
 import com.smartgreenhouse.greenhouse.entity.WateringLog;
 import com.smartgreenhouse.greenhouse.util.sensorMapper.SensorMapper;
 import org.springframework.stereotype.Component;
@@ -88,6 +89,22 @@ public class GreenhouseMapper {
         dto.setGreenhouseId(wateringLog.getGreenhouse().getId());
         dto.setGreenhouseName(wateringLog.getGreenhouse().getName());
         dto.setWateringSource(wateringLog.getWateringSource());
+        return dto;
+    }
+
+    public GreenhouseBasicDTO toBasicDTO(Greenhouse greenhouse) {
+        GreenhouseBasicDTO dto = new GreenhouseBasicDTO();
+        dto.setId(greenhouse.getId());
+        dto.setName(greenhouse.getName());
+        dto.setLocation(greenhouse.getLocation());
+        dto.setCapacity(greenhouse.getCapacity());
+        dto.setMoistureThreshold(greenhouse.getMoistureThreshold());
+        dto.setDefaultWateringAmount(greenhouse.getDefaultWateringAmount());
+        dto.setAutoWateringEnabled(greenhouse.getAutoWateringEnabled());
+        dto.setActiveSensorCount((int) greenhouse.getSensors().stream()
+                .filter(Sensor::getIsActive)
+                .count());
+        dto.setWateringLogCount(greenhouse.getWateringLogs().size());
         return dto;
     }
 }
