@@ -1,4 +1,4 @@
-package com.smartgreenhouse.greenhouse.service;
+package com.smartgreenhouse.greenhouse.service.impl;
 
 import com.smartgreenhouse.greenhouse.entity.RefreshToken;
 import com.smartgreenhouse.greenhouse.entity.User;
@@ -6,8 +6,10 @@ import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
 import com.smartgreenhouse.greenhouse.exceptions.TokenException;
 import com.smartgreenhouse.greenhouse.repository.RefreshTokenRepository;
 import com.smartgreenhouse.greenhouse.repository.UserRepository;
+import com.smartgreenhouse.greenhouse.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -27,6 +29,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
+    @Transactional
     public RefreshToken generateRefreshToken(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ObjectNotFoundException("User with email" + userEmail + "not found"));
@@ -42,6 +45,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
+    @Transactional
     public RefreshToken verifyRefreshToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .filter(refreshToken -> !isExpired(refreshToken))
@@ -50,6 +54,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
+    @Transactional
     public void revokeRefreshToken(String token) {
         refreshTokenRepository.findByToken(token)
                 .ifPresent(refreshToken -> {
