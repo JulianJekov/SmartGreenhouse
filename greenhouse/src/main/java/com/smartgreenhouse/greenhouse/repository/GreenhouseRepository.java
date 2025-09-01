@@ -6,14 +6,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GreenhouseRepository extends JpaRepository<Greenhouse, Long> {
-    boolean existsByNameAndIdNot(String name, Long id);
-
-    boolean existsByName(String name);
 
     @EntityGraph("Greenhouse.withSensors")
     List<Greenhouse> findByAutoWateringEnabledTrue();
 
+    Optional<Greenhouse> findByIdAndUserEmail(Long id, String email);
+
+    List<Greenhouse> findAllByUserEmail(String email);
+
+    boolean existsByIdAndUserEmail(Long id, String email);
+
+    boolean existsByNameAndUserEmail(String name, String email);
+
+    boolean existsByNameAndIdNotAndUserEmail(String name, Long id, String email);
 }
