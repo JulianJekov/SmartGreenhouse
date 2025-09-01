@@ -46,24 +46,25 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     @Transactional(readOnly = true)
     @Override
-    public GreenhouseDTO getGreenhouseById(Long id) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(id);
-        return greenhouseMapper.toDto(greenhouse);
+    public GreenhouseBasicDTO getGreenhouseById(Long id, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(id, email);
+        return greenhouseMapper.toBasicDTO(greenhouse);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<GreenhouseDTO> getAllGreenhouses() {
-        return greenhouseRepository.findAll().stream()
-                .map(greenhouseMapper::toDto)
-                .collect(Collectors.toList());
+    public List<GreenhouseBasicDTO> getUserGreenhousesBasic(String email) {
+        return greenhouseRepository.findAllByUserEmail(email)
+                .stream()
+                .map(greenhouseMapper::toBasicDTO)
+                .toList();
     }
 
     @Transactional
     @Override
-    public GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto, String userEmail) {
-        User user = userService.getUserByEmail(userEmail);
-        throwIfDuplicatedNames(dto.getName());
+    public GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto, String email) {
+        User user = userService.getUserByEmail(email);
+        throwIfDuplicatedNames(dto.getName(), email);
         Greenhouse greenhouse = greenhouseMapper.toEntity(dto);
         greenhouse.setUser(user);
         greenhouseRepository.save(greenhouse);
@@ -72,19 +73,19 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     @Transactional
     @Override
-    public GreenhouseDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(id);
-        throwIfDuplicatedNames(dto.getName());
+    public GreenhouseBasicDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(id, email);
+        throwIfDuplicatedNames(dto.getName(), id, email);
         greenhouseMapper.updateEntity(dto, greenhouse);
         Greenhouse updated = greenhouseRepository.save(greenhouse);
-        return greenhouseMapper.toDto(updated);
+        return greenhouseMapper.toBasicDTO(updated);
     }
 
     @Transactional
     @Override
-    public void deleteGreenhouse(Long id) {
-        if (!greenhouseRepository.existsById(id)) {
-            throw new ObjectNotFoundException("Greenhouse not found with ID: " + id);
+    public void deleteGreenhouse(Long id, String email) {
+        if (!greenhouseRepository.existsByIdAndUserEmail(id, email)) {
+            throw new ObjectNotFoundException("Resource not found");
         }
         greenhouseRepository.deleteById(id);
     }
@@ -99,8 +100,8 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     @Transactional
     @Override
-    public List<SensorDTO> getSensorsByGreenhouseId(Long id) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+    public List<SensorDTO> getSensorsByGreenhouseId(Long id, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(id, email);
         return greenhouse.getSensors().stream()
                 .map(sensorMapper::toDto)
                 .toList();
@@ -108,9 +109,8 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     @Transactional
     @Override
-    public List<GreenhouseOverviewDTO> getGreenhousesOverview() {
-        //TODO: when add users change it find by user id
-        List<Greenhouse> allGreenhouses = greenhouseRepository.findAll();
+    public List<GreenhouseOverviewDTO> getGreenhousesOverview(String email) {
+        List<Greenhouse> allGreenhouses = greenhouseRepository.findAllByUserEmail(email);
 
         List<Long> sensorIds = allGreenhouses.stream()
                 .flatMap(g -> g.getSensors().stream())
@@ -129,24 +129,24 @@ public class GreenhouseServiceImpl implements GreenhouseService {
 
     @Transactional(readOnly = true)
     @Override
-    public GreenhouseSettingsDTO getSettings(Long id) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+    public GreenhouseSettingsDTO getSettings(Long id, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(id, email);
         return greenhouseMapper.toSettingsDto(greenhouse);
     }
 
     @Transactional
     @Override
-    public GreenhouseDTO updateSettings(Long id, GreenhouseSettingsDTO settingsDTO) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+    public GreenhouseSettingsDTO updateSettings(Long id, GreenhouseSettingsDTO settingsDTO, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(id, email);
         greenhouseMapper.updateSettings(settingsDTO, greenhouse);
         Greenhouse updated = greenhouseRepository.save(greenhouse);
-        return greenhouseMapper.toDto(updated);
+        return greenhouseMapper.toSettingsDto(updated);
     }
 
     @Transactional
     @Override
-    public void toggleAutoWatering(Long id) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(id);
+    public void toggleAutoWatering(Long id, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(id, email);
         greenhouse.setAutoWateringEnabled(!greenhouse.getAutoWateringEnabled());
         greenhouseRepository.save(greenhouse);
     }
@@ -171,14 +171,20 @@ public class GreenhouseServiceImpl implements GreenhouseService {
                 .orElse(null);
     }
 
-    private Greenhouse getGreenhouseOrThrow(Long id) {
-        return greenhouseRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
+    private Greenhouse getGreenhouseByIdAndUserOrThrow(Long id, String email) {
+        return greenhouseRepository.findByIdAndUserEmail(id, email)
+                .orElseThrow(() -> new ObjectNotFoundException("Resource not found"));
     }
 
 
-    private void throwIfDuplicatedNames(String name) {
-        if (greenhouseRepository.existsByName(name)) {
+    private void throwIfDuplicatedNames(String name, Long id, String email) {
+        if (greenhouseRepository.existsByNameAndIdNotAndUserEmail(name, id, email)) {
+            throw new NameAlreadyExistsException("Greenhouse with this name: " + name + ", already exists");
+        }
+    }
+
+    private void throwIfDuplicatedNames(String name, String email) {
+        if (greenhouseRepository.existsByNameAndUserEmail(name, email)) {
             throw new NameAlreadyExistsException("Greenhouse with this name: " + name + ", already exists");
         }
     }
