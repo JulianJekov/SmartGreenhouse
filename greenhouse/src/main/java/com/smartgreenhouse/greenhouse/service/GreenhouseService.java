@@ -10,25 +10,25 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GreenhouseService {
-    GreenhouseDTO getGreenhouseById(Long id);
-
-    List<GreenhouseDTO> getAllGreenhouses();
+    GreenhouseBasicDTO getGreenhouseById(Long id, String email);
 
     GreenhouseDTO createGreenhouse(CreateGreenhouseDTO dto, String email);
 
-    GreenhouseDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto);
+    GreenhouseBasicDTO updateGreenhouse(Long id, UpdateGreenhouseDTO dto, String email);
 
-    void deleteGreenhouse(Long id);
+    void deleteGreenhouse(Long id, String email);
 
     Optional<Sensor> findActiveMoistureSensor(Greenhouse greenhouse);
 
-    List<SensorDTO> getSensorsByGreenhouseId(Long id);
+    List<SensorDTO> getSensorsByGreenhouseId(Long id, String email);
 
-    List<GreenhouseOverviewDTO> getGreenhousesOverview();
+    List<GreenhouseOverviewDTO> getGreenhousesOverview(String email);
 
-    GreenhouseSettingsDTO getSettings(Long id);
+    GreenhouseSettingsDTO getSettings(Long id, String email);
 
-    GreenhouseDTO updateSettings(Long id, GreenhouseSettingsDTO settingsDTO);
+    GreenhouseSettingsDTO updateSettings(Long id, GreenhouseSettingsDTO settingsDTO, String email);
 
-    void toggleAutoWatering(Long id);
+    void toggleAutoWatering(Long id, String email);
+
+    List<GreenhouseBasicDTO> getUserGreenhousesBasic(String email);
 }
