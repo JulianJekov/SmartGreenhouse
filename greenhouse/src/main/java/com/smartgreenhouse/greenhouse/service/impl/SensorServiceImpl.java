@@ -27,7 +27,7 @@ public class SensorServiceImpl implements SensorService {
     private final GreenhouseRepository greenhouseRepository;
     private final SensorMapper sensorMapper;
     private final SimulatedSensorReader simulatedSensorReader;
-    private final SensorReadingRepository  sensorReadingRepository;
+    private final SensorReadingRepository sensorReadingRepository;
 
     public SensorServiceImpl(SensorRepository sensorRepository,
                              GreenhouseRepository greenhouseRepository,
@@ -43,15 +43,15 @@ public class SensorServiceImpl implements SensorService {
 
     @Override
     @Transactional(readOnly = true)
-    public SensorDTO getSensorById(Long id) {
-        Sensor sensor = getSensorOrThrow(id);
+    public SensorDTO getSensorById(Long id, String email) {
+        Sensor sensor = getSensorByIdAndUserOrThrow(id, email);
         return sensorMapper.toDto(sensor);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<SensorDTO> getAllSensors() {
-        return sensorRepository.findAll()
+    public List<SensorDTO> getAllSensors(String email) {
+        return sensorRepository.findAllByGreenhouseUserEmail(email)
                 .stream()
                 .map(sensorMapper::toDto)
                 .toList();
@@ -59,8 +59,8 @@ public class SensorServiceImpl implements SensorService {
 
     @Override
     @Transactional
-    public SensorDTO createSensor(CreateSensorDTO dto) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(dto.getGreenhouseId());
+    public SensorDTO createSensor(CreateSensorDTO dto, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(dto.getGreenhouseId(), email);
         Sensor sensor = sensorMapper.toEntity(dto, greenhouse);
         Sensor saved = sensorRepository.save(sensor);
         return sensorMapper.toDto(saved);
@@ -68,9 +68,9 @@ public class SensorServiceImpl implements SensorService {
 
     @Override
     @Transactional
-    public SensorDTO updateSensor(Long id, UpdateSensorDTO dto) {
-        Greenhouse greenhouse = getGreenhouseOrThrow(dto.getGreenhouseId());
-        Sensor sensor = getSensorOrThrow(id);
+    public SensorDTO updateSensor(Long id, UpdateSensorDTO dto, String email) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(dto.getGreenhouseId(), email);
+        Sensor sensor = getSensorByIdAndUserOrThrow(id, email);
         sensorMapper.updateEntity(dto, sensor, greenhouse);
         Sensor updated = sensorRepository.save(sensor);
         return sensorMapper.toDto(updated);
@@ -78,16 +78,16 @@ public class SensorServiceImpl implements SensorService {
 
     @Override
     @Transactional
-    public void deleteSensor(Long id) {
-        if (!sensorRepository.existsById(id)) {
-            throw new ObjectNotFoundException("Sensor not found with ID: " + id);
+    public void deleteSensor(Long id, String email) {
+        if (!sensorRepository.existsByIdAndGreenhouseUserEmail(id, email)) {
+            throw new ObjectNotFoundException("Resource not found");
         }
         sensorRepository.deleteById(id);
     }
 
     @Override
-    public SensorStatsDTO getSensorStats(Long sensorId) {
-        Sensor sensor = getSensorOrThrow(sensorId);
+    public SensorStatsDTO getSensorStats(Long sensorId, String email) {
+        Sensor sensor = getSensorByIdAndUserOrThrow(sensorId, email);
         Double currentValue = simulatedSensorReader.readValue(sensor);
         List<SensorReading> lastReadings = sensorReadingRepository.findTop10BySensorIdOrderByTimestamp(sensorId);
         Double minValue = lastReadings.stream().mapToDouble(SensorReading::getValue).min().orElse(0.0);
@@ -97,13 +97,13 @@ public class SensorServiceImpl implements SensorService {
         return new SensorStatsDTO(currentValue, minValue, maxValue, averageValue, lastUpdate);
     }
 
-    private Sensor getSensorOrThrow(Long id) {
-        return sensorRepository.findById(id).orElseThrow(() ->
-                new ObjectNotFoundException("Sensor not found with ID: " + id));
+    private Sensor getSensorByIdAndUserOrThrow(Long id, String email) {
+        return sensorRepository.findByIdAndGreenhouseUserEmail(id, email).orElseThrow(() ->
+                new ObjectNotFoundException("Resource not found"));
     }
 
-    private Greenhouse getGreenhouseOrThrow(Long greenhouseId) {
-        return greenhouseRepository.findById(greenhouseId)
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + greenhouseId));
+    private Greenhouse getGreenhouseByIdAndUserOrThrow(Long greenhouseId, String email) {
+        return greenhouseRepository.findByIdAndUserEmail(greenhouseId, email)
+                .orElseThrow(() -> new ObjectNotFoundException("Resource not found"));
     }
 }
