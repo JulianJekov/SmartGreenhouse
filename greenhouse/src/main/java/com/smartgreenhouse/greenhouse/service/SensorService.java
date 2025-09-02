@@ -8,15 +8,15 @@ import com.smartgreenhouse.greenhouse.dto.sensor.UpdateSensorDTO;
 import java.util.List;
 
 public interface SensorService {
-    SensorDTO getSensorById(Long id);
+    SensorDTO getSensorById(Long id, String email);
 
-    List<SensorDTO> getAllSensors();
+    List<SensorDTO> getAllSensors(String email);
 
-    SensorDTO createSensor(CreateSensorDTO dto);
+    SensorDTO createSensor(CreateSensorDTO dto, String email);
 
-    SensorDTO updateSensor(Long id, UpdateSensorDTO dto);
+    SensorDTO updateSensor(Long id, UpdateSensorDTO dto, String email);
 
-    void deleteSensor(Long id);
+    void deleteSensor(Long id, String email);
 
-    SensorStatsDTO getSensorStats(Long sensorId);
+    SensorStatsDTO getSensorStats(Long sensorId, String email);
 }
