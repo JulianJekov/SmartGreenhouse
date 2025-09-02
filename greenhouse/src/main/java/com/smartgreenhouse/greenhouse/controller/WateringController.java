@@ -3,10 +3,12 @@ package com.smartgreenhouse.greenhouse.controller;
 import com.smartgreenhouse.greenhouse.enums.WateringSource;
 import com.smartgreenhouse.greenhouse.exceptions.WateringFailedException;
 import com.smartgreenhouse.greenhouse.service.WateringService;
-import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/watering")
