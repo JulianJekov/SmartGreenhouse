@@ -31,9 +31,9 @@ public class WateringLogServiceImpl implements WateringLogService {
 
     @Transactional
     @Override
-    public WateringLogDTO createWateringLog(CreateWateringLogDTO dto) {
+    public WateringLogDTO createWateringLog(CreateWateringLogDTO dto, String email) {
         Long greenhouseId = dto.getGreenhouseId();
-        Greenhouse greenhouse = getGreenhouseOrThrow(greenhouseId);
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(greenhouseId, email);
         WateringLog wateringLog = wateringLogMapper.toEntity(dto, greenhouse);
         WateringLog saved = wateringLogRepository.save(wateringLog);
         return wateringLogMapper.toDto(saved);
@@ -41,8 +41,8 @@ public class WateringLogServiceImpl implements WateringLogService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<WateringLogDTO> getWateringLogByGreenhouseId(Long greenhouseId, int page, int size) {
-        getGreenhouseOrThrow(greenhouseId);
+    public Page<WateringLogDTO> getWateringLogByGreenhouseId(Long greenhouseId, String email, int page, int size) {
+        getGreenhouseByIdAndUserOrThrow(greenhouseId, email);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
         return wateringLogRepository.findByGreenhouseId(greenhouseId, pageable)
                 .map(wateringLogMapper::toDto);
@@ -50,14 +50,14 @@ public class WateringLogServiceImpl implements WateringLogService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<WateringLogDTO> getAllWateringLogs(int page, int size) {
+    public Page<WateringLogDTO> getAllWateringLogs(String email, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
-        return wateringLogRepository.findAll(pageable)
+        return wateringLogRepository.findAllByGreenhouseUserEmail(email, pageable)
                 .map(wateringLogMapper::toDto);
     }
 
-    private Greenhouse getGreenhouseOrThrow(Long greenhouseId) {
-        return greenhouseRepository.findById(greenhouseId)
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + greenhouseId));
+    private Greenhouse getGreenhouseByIdAndUserOrThrow(Long id, String email) {
+        return greenhouseRepository.findByIdAndUserEmail(id, email)
+                .orElseThrow(() -> new ObjectNotFoundException("Resource not found"));
     }
 }
