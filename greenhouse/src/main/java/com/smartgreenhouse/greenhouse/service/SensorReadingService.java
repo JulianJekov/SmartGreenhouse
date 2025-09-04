@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface SensorReadingService {
 
-    SensorReadingDTO createSensorReading(CreateSensorReadingDTO createSensorReadingDTO);
+    SensorReadingDTO createSensorReading(CreateSensorReadingDTO createSensorReadingDTO, String email);
 
-    SensorReadingDTO getLatestSensorReading(Long sensorId);
+    SensorReadingDTO getLatestSensorReading(Long sensorId, String email);
 
-    List<SensorReadingDTO> getSensorReadingsInRange(Long sensorId, LocalDateTime from, LocalDateTime to);
+    List<SensorReadingDTO> getSensorReadingsInRange(Long sensorId, String email, LocalDateTime from, LocalDateTime to);
 
 }
