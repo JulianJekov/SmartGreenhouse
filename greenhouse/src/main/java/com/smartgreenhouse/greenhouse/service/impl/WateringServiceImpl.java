@@ -46,8 +46,8 @@ public class WateringServiceImpl implements WateringService {
 
     @Override
     @Transactional
-    public void waterGreenhouse(Long greenhouseId, Double amount, WateringSource wateringSource) {
-        Greenhouse greenhouse = loadGreenhouseOrThrow(greenhouseId);
+    public void waterGreenhouse(Long greenhouseId, String email, Double amount, WateringSource wateringSource) {
+        Greenhouse greenhouse = getGreenhouseByIdAndUserOrThrow(greenhouseId, email);
 
         validateWaterAmount(amount);
 
@@ -74,9 +74,9 @@ public class WateringServiceImpl implements WateringService {
         wateringLocks.put(greenhouseId, true);
     }
 
-    private Greenhouse loadGreenhouseOrThrow(Long id) {
-        return greenhouseRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Greenhouse not found with ID: " + id));
+    private Greenhouse getGreenhouseByIdAndUserOrThrow(Long id, String email) {
+        return greenhouseRepository.findByIdAndUserEmail(id, email)
+                .orElseThrow(() -> new ObjectNotFoundException("Resource not found"));
     }
 
     private void performWatering(Greenhouse greenhouse, Double amount, WateringSource wateringSource) {
