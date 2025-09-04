@@ -31,10 +31,10 @@ public class SensorReadingServiceImpl implements SensorReadingService {
 
     @Transactional
     @Override
-    public SensorReadingDTO createSensorReading(CreateSensorReadingDTO createSensorReadingDTO) {
+    public SensorReadingDTO createSensorReading(CreateSensorReadingDTO createSensorReadingDTO, String email) {
         Long sensorId = createSensorReadingDTO.getSensorId();
-        Sensor sensor = sensorRepository.findById(sensorId)
-                .orElseThrow(() -> new ObjectNotFoundException("Sensor not found with ID " + sensorId));
+        Sensor sensor = sensorRepository.findByIdAndGreenhouseUserEmail(sensorId, email)
+                .orElseThrow(() -> new ObjectNotFoundException("Resource not found"));
         SensorReading sensorReading = sensorReadingMapper.toEntity(createSensorReadingDTO, sensor);
         SensorReading saved = sensorReadingRepository.save(sensorReading);
 
@@ -43,21 +43,32 @@ public class SensorReadingServiceImpl implements SensorReadingService {
 
     @Transactional(readOnly = true)
     @Override
-    public SensorReadingDTO getLatestSensorReading(Long sensorId) {
+    public SensorReadingDTO getLatestSensorReading(Long sensorId, String email) {
         Optional<SensorReading> sensorReading = sensorReadingRepository
-                .findTopBySensorIdOrderByTimestampDesc(sensorId);
+                .findTopBySensorIdAndSensorGreenhouseUserEmailOrderByTimestampDesc(sensorId, email);
         if (sensorReading.isEmpty()) {
-            throw new ObjectNotFoundException("Sensor Reading not found");
+            throw new ObjectNotFoundException("Resource not found");
         }
         return sensorReadingMapper.toDto(sensorReading.get());
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<SensorReadingDTO> getSensorReadingsInRange(Long sensorId, LocalDateTime from, LocalDateTime to) {
-        return sensorReadingRepository.findAllBySensorIdAndTimestampBetweenOrderByTimestampAsc(sensorId, from, to)
+    public List<SensorReadingDTO> getSensorReadingsInRange(Long sensorId, String email, LocalDateTime from, LocalDateTime to) {
+        validateSensorOwnershipOrThrow(sensorId, email);
+
+        return sensorReadingRepository
+                .findAllBySensorIdAndSensorGreenhouseUserEmailAndTimestampBetweenOrderByTimestampAsc(
+                        sensorId, email, from, to)
                 .stream()
                 .map(sensorReadingMapper::toDto)
                 .toList();
+    }
+
+    private void validateSensorOwnershipOrThrow(Long sensorId, String email) {
+        boolean exists = sensorReadingRepository.existsBySensorIdAndSensorGreenhouseUserEmail(sensorId, email);
+        if (!exists) {
+            throw new ObjectNotFoundException("Resource not found");
+        }
     }
 }
