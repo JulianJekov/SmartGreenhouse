@@ -38,6 +38,7 @@ public class AutoWateringScheduler {
                                 if (moistureValue < greenhouse.getMoistureThreshold()) {
                                     wateringService.waterGreenhouse(
                                             greenhouse.getId(),
+                                            greenhouse.getUser().getEmail(),
                                             greenhouse.getDefaultWateringAmount(),
                                             WateringSource.AUTO
                                     );
