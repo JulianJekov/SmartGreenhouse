@@ -12,11 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface SensorReadingRepository extends JpaRepository<SensorReading, Long> {
+    Optional<SensorReading> findTopBySensorIdAndSensorGreenhouseUserEmailOrderByTimestampDesc(Long id, String email);
 
-    Optional<SensorReading> findTopBySensorIdOrderByTimestampDesc(Long sensorId);
-
-    List<SensorReading> findAllBySensorIdAndTimestampBetweenOrderByTimestampAsc
-            (Long sensorId, LocalDateTime from, LocalDateTime to);
+    List<SensorReading> findAllBySensorIdAndSensorGreenhouseUserEmailAndTimestampBetweenOrderByTimestampAsc
+            (Long sensorId, String email, LocalDateTime from, LocalDateTime to);
 
     List<SensorReading> findAllBySensorIdOrderByTimestampAsc(Long sensorId);
 
@@ -44,4 +43,6 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
                   )
             """)
     List<SensorReading> findLatestReadingsForSensors(@Param("sensorIds") List<Long> sensorIds);
+
+    boolean existsBySensorIdAndSensorGreenhouseUserEmail(Long sensorId, String email);
 }
