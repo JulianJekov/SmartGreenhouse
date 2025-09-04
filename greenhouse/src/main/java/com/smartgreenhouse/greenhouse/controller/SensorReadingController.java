@@ -6,6 +6,8 @@ import com.smartgreenhouse.greenhouse.service.SensorReadingService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -23,21 +25,28 @@ public class SensorReadingController {
 
     @PostMapping
     public ResponseEntity<SensorReadingDTO> createSensorReading(
-            @Valid @RequestBody CreateSensorReadingDTO createSensorReadingDTO) {
+            @Valid @RequestBody CreateSensorReadingDTO createSensorReadingDTO,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        SensorReadingDTO sensorReading = sensorReadingService.createSensorReading(createSensorReadingDTO);
+        SensorReadingDTO sensorReading = sensorReadingService
+                .createSensorReading(createSensorReadingDTO, userDetails.getUsername());
         return ResponseEntity.ok(sensorReading);
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<SensorReadingDTO> getLatestSensorReadings(@RequestParam Long sensorId) {
-        SensorReadingDTO latestSensorReading = sensorReadingService.getLatestSensorReading(sensorId);
+    public ResponseEntity<SensorReadingDTO> getLatestSensorReadings(
+            @RequestParam Long sensorId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        SensorReadingDTO latestSensorReading = sensorReadingService
+                .getLatestSensorReading(sensorId, userDetails.getUsername());
         return ResponseEntity.ok(latestSensorReading);
     }
 
     @GetMapping("/history")
     public ResponseEntity<List<SensorReadingDTO>> getSensorReadingInRange(
             @RequestParam Long sensorId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam(required = false)
@@ -45,15 +54,18 @@ public class SensorReadingController {
 
         if (from == null) from = LocalDateTime.now().minusDays(24);
         if (to == null) to = LocalDateTime.now();
-        List<SensorReadingDTO> sensorReadingsInRange = sensorReadingService.getSensorReadingsInRange(sensorId, from, to);
+        List<SensorReadingDTO> sensorReadingsInRange = sensorReadingService
+                .getSensorReadingsInRange(sensorId, userDetails.getUsername(), from, to);
         return ResponseEntity.ok(sensorReadingsInRange);
     }
 
     @GetMapping
-    public List<SensorReadingDTO> getAllReadingsForSensor(@RequestParam Long sensorId) {
+    public List<SensorReadingDTO> getAllReadingsForSensor(
+            @RequestParam Long sensorId,
+            @AuthenticationPrincipal  UserDetails userDetails) {
         LocalDateTime from = LocalDateTime.now().minusMonths(1);
         LocalDateTime to = LocalDateTime.now();
-        return sensorReadingService.getSensorReadingsInRange(sensorId, from, to);
+        return sensorReadingService.getSensorReadingsInRange(sensorId, userDetails.getUsername(), from, to);
     }
 }
 
