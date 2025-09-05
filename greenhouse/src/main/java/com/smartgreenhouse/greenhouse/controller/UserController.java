@@ -41,6 +41,18 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
+        userService.verifyEmail(token);
+        return ResponseEntity.ok("Email verified successfully");
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<String> resendVerificationEmail(@RequestParam String email) {
+        userService.resendVerificationEmail(email);
+        return ResponseEntity.ok("Verification email sent");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest,
                                                   HttpServletResponse response) {
