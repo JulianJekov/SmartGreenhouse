@@ -14,4 +14,8 @@ public interface UserService {
     UserDTO getCurrentUser(String email);
 
     User getUserByEmail(String userEmail);
+
+    void verifyEmail(String token);
+
+    void resendVerificationEmail(String email);
 }
