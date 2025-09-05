@@ -19,6 +19,29 @@ spring:
         database-platform: org.hibernate.dialect.MySQLDialect
     application:
         name: greenhouse
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: smartgreenhouse.app@gmail.com
+        password: ${EMAIL_PASSWORD}
+        properties:
+          mail:
+              smtp:
+                  auth: true
+                  starttls:
+                      enable: true
+                  connectiontimeout: 5000
+                  timeout: 5000
+                  writetimeout: 5000
+app:
+    email:
+        from: smartgreenhouse.app@gmail.com
+        verification:
+            subject: "Verify Your Smart Greenhouse Account"
+            expiration-hours: 24
+        password-reset:
+            subject: "Reset Your Greenhouse Password"
+            expiration-hours: 1
 mqtt:
     broker-url: tcp://localhost:1883
     client-id: greenhouse-app
