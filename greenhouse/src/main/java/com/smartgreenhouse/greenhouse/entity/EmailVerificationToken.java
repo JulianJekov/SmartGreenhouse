@@ -6,30 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Entity
-@Table(name = "email_verification_toknes")
+@Table(name = "email_verification_tokenks")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailVerificationToken {
+public class EmailVerificationToken extends BaseToken {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
-    private String token;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",  nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @Column(nullable = false)
-    private Instant expiryDate;
-
-    @Column(nullable = false)
-    private Boolean used = false;
 }
