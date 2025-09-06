@@ -22,6 +22,9 @@ public class EmailService {
     @Value("${app.email.verification.subject}")
     private String verificationSubject;
 
+    @Value("${app.email.password-reset.subject}")
+    private String passwordResetSubject;
+
     public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
@@ -39,6 +42,19 @@ public class EmailService {
         sendEmail(user.getEmail(), verificationSubject, htmlContent);
     }
 
+    public void sendPasswordResetEmail(User user, String passwordResetToken) {
+        String resetUrl = "http://localhost:8080/api/user/reset-password?token=" + passwordResetToken;
+
+        Context context = new Context();
+        context.setVariable("name", user.getName());
+        context.setVariable("resetUrl", resetUrl);
+
+        String htmlContent = templateEngine.process("password-reset", context);
+
+        sendEmail(user.getEmail(), passwordResetSubject, htmlContent);
+
+    }
+
     private void sendEmail(String to, String subject, String htmlContent) {
         MimeMessage message = mailSender.createMimeMessage();
 
@@ -54,4 +70,6 @@ public class EmailService {
             throw new EmailException("Failed to send Email to: " + to, e);
         }
     }
+
+
 }
