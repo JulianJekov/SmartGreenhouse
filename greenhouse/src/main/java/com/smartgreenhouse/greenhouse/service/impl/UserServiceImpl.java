@@ -4,6 +4,7 @@ import com.smartgreenhouse.greenhouse.dto.user.AuthResponse;
 import com.smartgreenhouse.greenhouse.dto.user.LoginRequest;
 import com.smartgreenhouse.greenhouse.dto.user.RegisterRequest;
 import com.smartgreenhouse.greenhouse.dto.user.UserDTO;
+import com.smartgreenhouse.greenhouse.entity.BaseToken;
 import com.smartgreenhouse.greenhouse.entity.EmailVerificationToken;
 import com.smartgreenhouse.greenhouse.entity.User;
 import com.smartgreenhouse.greenhouse.exceptions.*;
@@ -15,16 +16,18 @@ import com.smartgreenhouse.greenhouse.util.userMapper.UserMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Value("${app.email.verification.expiration-hours}")
-    private static Integer verificationExpiryHours;
+    private int verificationExpiryHours;
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -47,6 +50,7 @@ public class UserServiceImpl implements UserService {
         this.emailService = emailService;
     }
 
+    @Transactional
     @Override
     public AuthResponse register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -62,7 +66,8 @@ public class UserServiceImpl implements UserService {
         AuthResponse authResponse = userMapper.toAuthResponse(savedUser);
         authResponse.setToken(token);
 
-        EmailVerificationToken emailVerificationToken = generateVerificationToken(user);
+        EmailVerificationToken emailVerificationToken = generateToken
+                (user, EmailVerificationToken::new, verificationExpiryHours);
 
         tokenRepository.save(emailVerificationToken);
 
@@ -71,35 +76,7 @@ public class UserServiceImpl implements UserService {
         return authResponse;
     }
 
-
-    @Override
-    public void verifyEmail(String token) {
-        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));
-
-        if (verificationToken.getUsed()) {
-            throw new InvalidTokenException("Token already used");
-        }
-
-        if (verificationToken.getExpiryDate().isBefore(Instant.now())) {
-            throw new InvalidTokenException("Token expired");
-        }
-
-        User user = verificationToken.getUser();
-        user.setEmailVerified(true);
-        verificationToken.setUsed(true);
-        tokenRepository.save(verificationToken);
-    }
-
-    @Override
-    public void resendVerificationEmail(String email) {
-        User user = getUserByEmail(email);
-
-        EmailVerificationToken emailVerificationToken = generateVerificationToken(user);
-        tokenRepository.save(emailVerificationToken);
-        emailService.sendVerificationEmail(user, emailVerificationToken.getToken());
-    }
-
+    @Transactional
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
@@ -117,6 +94,41 @@ public class UserServiceImpl implements UserService {
         return authResponse;
     }
 
+
+    @Transactional
+    @Override
+    public void verifyEmail(String token) {
+        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));
+
+        validateToken(verificationToken);
+
+        User user = verificationToken.getUser();
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        verificationToken.setUsed(true);
+        tokenRepository.save(verificationToken);
+    }
+
+    @Transactional
+    @Override
+    public void resendVerificationEmail(String email) {
+        User user = getUserByEmail(email);
+
+        tokenRepository.revokeAllUserTokens(user.getId());
+
+        EmailVerificationToken emailVerificationToken = generateToken
+                (user, EmailVerificationToken::new, verificationExpiryHours);
+        tokenRepository.save(emailVerificationToken);
+
+        emailService.sendVerificationEmail(user, emailVerificationToken.getToken());
+    }
+
+    @Transactional
+    @Override
+    }
+
+    @Transactional
     @Override
     public UserDTO getCurrentUser(String email) {
         User user = userRepository.findByEmail(email)
@@ -124,16 +136,21 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDTO(user);
     }
 
-    @Override
-    public User getUserByEmail(String userEmail) {
-        return userRepository.findByEmail(userEmail).orElseThrow(() -> new ObjectNotFoundException("User not found"));
+    private <T extends BaseToken> T generateToken(User user, Supplier<T> tokenConstructor, int expiryHours) {
+        T token = tokenConstructor.get();
+        token.setUser(user);
+        token.setToken(UUID.randomUUID().toString());
+        token.setExpiryDate(Instant.now().plus(expiryHours, ChronoUnit.HOURS));
+        return token;
     }
 
-    private static EmailVerificationToken generateVerificationToken(User user) {
-        EmailVerificationToken emailVerificationToken = new EmailVerificationToken();
-        emailVerificationToken.setUser(user);
-        emailVerificationToken.setToken(UUID.randomUUID().toString());
-        emailVerificationToken.setExpiryDate(Instant.now().plus(verificationExpiryHours, ChronoUnit.HOURS));
-        return emailVerificationToken;
+    private static void validateToken(BaseToken token) {
+        if (token.getUsed() || token.getRevoked()) {
+            throw new InvalidTokenException("Token already used");
+        }
+
+        if (token.getExpiryDate().isBefore(Instant.now())) {
+            throw new InvalidTokenException("Token expired");
+        }
     }
 }
