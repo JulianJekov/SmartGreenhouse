@@ -6,13 +6,17 @@ import com.smartgreenhouse.greenhouse.dto.user.RegisterRequest;
 import com.smartgreenhouse.greenhouse.dto.user.UserDTO;
 import com.smartgreenhouse.greenhouse.entity.BaseToken;
 import com.smartgreenhouse.greenhouse.entity.EmailVerificationToken;
+import com.smartgreenhouse.greenhouse.entity.PasswordResetToken;
 import com.smartgreenhouse.greenhouse.entity.User;
 import com.smartgreenhouse.greenhouse.exceptions.*;
 import com.smartgreenhouse.greenhouse.jwt.JWTHelper;
 import com.smartgreenhouse.greenhouse.repository.EmailVerificationTokenRepository;
+import com.smartgreenhouse.greenhouse.repository.PasswordResetTokenRepository;
 import com.smartgreenhouse.greenhouse.repository.UserRepository;
 import com.smartgreenhouse.greenhouse.service.UserService;
 import com.smartgreenhouse.greenhouse.util.userMapper.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,25 +33,31 @@ public class UserServiceImpl implements UserService {
     @Value("${app.email.verification.expiration-hours}")
     private int verificationExpiryHours;
 
+    @Value("${app.email.password-reset.expiration-hours}")
+    private int passwordResetExpiryHours;
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JWTHelper jWTHelper;
     private final EmailVerificationTokenRepository tokenRepository;
     private final EmailService emailService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     public UserServiceImpl(UserRepository userRepository,
                            UserMapper userMapper,
                            PasswordEncoder passwordEncoder,
                            JWTHelper jWTHelper,
                            EmailVerificationTokenRepository tokenRepository,
-                           EmailService emailService) {
+                           EmailService emailService, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jWTHelper = jWTHelper;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @Transactional
@@ -126,6 +136,38 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    public void createPasswordResetToken(String email) {
+        User user = getUserByEmail(email);
+        logger.info("Creating password reset token for email: {}", email);
+        PasswordResetToken passwordResetToken = generateToken
+                (user, PasswordResetToken::new, passwordResetExpiryHours);
+
+        passwordResetTokenRepository.save(passwordResetToken);
+        logger.info("Sending password reset email to: {}", email);
+        emailService.sendPasswordResetEmail(user, passwordResetToken.getToken());
+        logger.info("Password reset email sent to: {}", email);
+    }
+
+    @Transactional
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new InvalidTokenException("Invalid password reset token"));
+
+        validateToken(passwordResetToken);
+
+        User user = passwordResetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        passwordResetToken.setUsed(true);
+        passwordResetTokenRepository.save(passwordResetToken);
+    }
+
+    @Transactional
+    @Override
+    public User getUserByEmail(String userEmail) {
+        return userRepository.findByEmail(userEmail).orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
     @Transactional
