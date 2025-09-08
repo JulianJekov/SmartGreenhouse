@@ -1,9 +1,6 @@
 package com.smartgreenhouse.greenhouse.controller;
 
-import com.smartgreenhouse.greenhouse.dto.user.AuthResponse;
-import com.smartgreenhouse.greenhouse.dto.user.LoginRequest;
-import com.smartgreenhouse.greenhouse.dto.user.RegisterRequest;
-import com.smartgreenhouse.greenhouse.dto.user.UserDTO;
+import com.smartgreenhouse.greenhouse.dto.user.*;
 import com.smartgreenhouse.greenhouse.entity.RefreshToken;
 import com.smartgreenhouse.greenhouse.entity.User;
 import com.smartgreenhouse.greenhouse.exceptions.TokenException;
@@ -51,6 +48,18 @@ public class UserController {
     public ResponseEntity<String> resendVerificationEmail(@RequestParam String email) {
         userService.resendVerificationEmail(email);
         return ResponseEntity.ok("Verification email sent");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        userService.createPasswordResetToken(request.getEmail());
+        return ResponseEntity.ok("If the email exists, a reset link has been sent");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Password reset successfully");
     }
 
     @PostMapping("/login")
