@@ -3,6 +3,7 @@ package com.smartgreenhouse.greenhouse.controller;
 import com.smartgreenhouse.greenhouse.dto.user.*;
 import com.smartgreenhouse.greenhouse.entity.RefreshToken;
 import com.smartgreenhouse.greenhouse.entity.User;
+import com.smartgreenhouse.greenhouse.exceptions.InvalidTokenException;
 import com.smartgreenhouse.greenhouse.exceptions.TokenException;
 import com.smartgreenhouse.greenhouse.jwt.JWTHelper;
 import com.smartgreenhouse.greenhouse.service.RefreshTokenService;
@@ -110,7 +111,7 @@ public class UserController {
             HttpServletResponse response) {
 
         if (refreshToken == null) {
-            throw new TokenException("Refresh token not found");
+            throw new InvalidTokenException("Refresh token not found");
         }
 
         RefreshToken verifiedToken = refreshTokenService.verifyRefreshToken(refreshToken);
