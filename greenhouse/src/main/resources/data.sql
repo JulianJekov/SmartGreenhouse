@@ -9,7 +9,7 @@ VALUES ('admin@greenhouse.com', '$2a$12$r4B7U7F7G7H7J7K7L7M7N7O7P7Q7R7S7T7U7V7W7
        ('jane@greenhouse.com', '$2a$12$t6D9W9H9J9K9L9M9N9O9P9Q9R9S9T9U9V9W9X9Y9Z9a9b9c9d9e9f', 'Jane Smith', 'USER');
 
 -- INSERT GREENHOUSES WITH ALL REQUIRED COLUMNS
-INSERT INTO greenhouse (id, name, location, capacity, user_id, moisture_threshold, default_watering_amount,
+INSERT INTO greenhouses (id, name, location, capacity, user_id, moisture_threshold, default_watering_amount,
                         auto_watering_enabled)
 VALUES (1, 'Greenhouse Alpha', 'Backyard', 5, 2, 40.0, 20.0, true),
        (2, 'Greenhouse Beta', 'Frontyard', 8, 2, 35.0, 25.0, true),
@@ -45,7 +45,7 @@ VALUES ('TEMPERATURE', '°C', 5.0, 45.0, true, 5),
        ('LIGHT', 'lux', 200.0, 800.0, true, 5);
 
 -- ADD SOME WATERING LOGS FOR REALISM (using watering_source instead of source)
-INSERT INTO watering_log (timestamp, water_amount, watering_source, greenhouse_id)
+INSERT INTO watering_logs (timestamp, water_amount, watering_source, greenhouse_id)
 VALUES (NOW() - INTERVAL 2 DAY, 15.0, 'MANUAL', 1),
        (NOW() - INTERVAL 1 DAY, 20.0, 'AUTO', 1),
        (NOW() - INTERVAL 3 DAY, 18.0, 'MANUAL', 2),
