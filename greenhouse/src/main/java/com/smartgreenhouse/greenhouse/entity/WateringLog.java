@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table
+@Table(name = "watering_logs")
 @Getter
 @Setter
 public class WateringLog {
