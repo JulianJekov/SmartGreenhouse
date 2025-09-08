@@ -2,6 +2,7 @@ package com.smartgreenhouse.greenhouse.service.impl;
 
 import com.smartgreenhouse.greenhouse.entity.RefreshToken;
 import com.smartgreenhouse.greenhouse.entity.User;
+import com.smartgreenhouse.greenhouse.exceptions.InvalidTokenException;
 import com.smartgreenhouse.greenhouse.exceptions.ObjectNotFoundException;
 import com.smartgreenhouse.greenhouse.exceptions.TokenException;
 import com.smartgreenhouse.greenhouse.repository.RefreshTokenRepository;
@@ -50,7 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshTokenRepository.findByToken(token)
                 .filter(refreshToken -> !isExpired(refreshToken))
                 .filter(refreshToken -> !isRevoked(refreshToken))
-                .orElseThrow(() -> new TokenException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
     }
 
     @Override
