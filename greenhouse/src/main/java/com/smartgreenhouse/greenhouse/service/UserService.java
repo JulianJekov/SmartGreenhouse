@@ -18,4 +18,8 @@ public interface UserService {
     void verifyEmail(String token);
 
     void resendVerificationEmail(String email);
+
+    void createPasswordResetToken(String email);
+
+    void resetPassword(String token, String newPassword);
 }
