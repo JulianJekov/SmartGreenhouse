@@ -135,8 +135,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
-    @ExceptionHandler(TokenException.class)
-    public ResponseEntity<String> handleTokenException(TokenException ex) {
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<String> handleTokenException(InvalidTokenException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
