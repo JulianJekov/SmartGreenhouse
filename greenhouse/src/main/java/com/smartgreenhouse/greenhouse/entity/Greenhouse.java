@@ -15,7 +15,7 @@ import java.util.List;
         name = "Greenhouse.withSensors",
         attributeNodes = @NamedAttributeNode("sensors")
 )
-@Table
+@Table(name = "greenhouses")
 @Getter
 @Setter
 @NoArgsConstructor
