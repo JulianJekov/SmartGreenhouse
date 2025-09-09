@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     private final EmailVerificationTokenRepository tokenRepository;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     public UserServiceImpl(UserRepository userRepository,
                            UserMapper userMapper,
@@ -138,14 +138,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createPasswordResetToken(String email) {
         User user = getUserByEmail(email);
-        logger.info("Creating password reset token for email: {}", email);
+        LOGGER.info("Creating password reset token for email: {}", email);
+
+        passwordResetTokenRepository.revokeAllUserTokens(user.getId());
+
         PasswordResetToken passwordResetToken = generateToken
                 (user, PasswordResetToken::new, passwordResetExpiryHours);
 
         passwordResetTokenRepository.save(passwordResetToken);
-        logger.info("Sending password reset email to: {}", email);
+        LOGGER.info("Sending password reset email to: {}", email);
         emailService.sendPasswordResetEmail(user, passwordResetToken.getToken());
-        logger.info("Password reset email sent to: {}", email);
+        LOGGER.info("Password reset email sent to: {}", email);
     }
 
     @Transactional
