@@ -31,6 +31,8 @@ public abstract class BaseToken {
     @Column(nullable = false)
     private Boolean revoked = false;
 
+    private Instant created =  Instant.now();
+
     public abstract User getUser();
     public abstract void setUser(User user);
 }
