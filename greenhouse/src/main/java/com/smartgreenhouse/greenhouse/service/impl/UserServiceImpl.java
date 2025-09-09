@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -41,7 +40,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JWTHelper jWTHelper;
-    private final EmailVerificationTokenRepository tokenRepository;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -50,13 +49,13 @@ public class UserServiceImpl implements UserService {
                            UserMapper userMapper,
                            PasswordEncoder passwordEncoder,
                            JWTHelper jWTHelper,
-                           EmailVerificationTokenRepository tokenRepository,
+                           EmailVerificationTokenRepository emailVerificationTokenRepository,
                            EmailService emailService, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jWTHelper = jWTHelper;
-        this.tokenRepository = tokenRepository;
+        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.emailService = emailService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
@@ -80,7 +79,7 @@ public class UserServiceImpl implements UserService {
         EmailVerificationToken emailVerificationToken = generateToken
                 (user, EmailVerificationToken::new, verificationExpiryHours);
 
-        tokenRepository.save(emailVerificationToken);
+        emailVerificationTokenRepository.save(emailVerificationToken);
 
         emailService.sendVerificationEmail(user, emailVerificationToken.getToken());
 
@@ -109,7 +108,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void verifyEmail(String token) {
-        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
+        EmailVerificationToken verificationToken = emailVerificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid verification token"));
 
         validateToken(verificationToken);
@@ -118,7 +117,7 @@ public class UserServiceImpl implements UserService {
         user.setEmailVerified(true);
         userRepository.save(user);
         verificationToken.setUsed(true);
-        tokenRepository.save(verificationToken);
+        emailVerificationTokenRepository.save(verificationToken);
     }
 
     @Transactional
@@ -126,11 +125,19 @@ public class UserServiceImpl implements UserService {
     public void resendVerificationEmail(String email) {
         User user = getUserByEmail(email);
 
-        tokenRepository.revokeAllUserTokens(user.getId());
+        Instant oneHourAgo = Instant.now().minus(1, ChronoUnit.HOURS);
+
+        long recentTokenCount = emailVerificationTokenRepository.countRecentTokensByUserId(user.getId(), oneHourAgo);
+
+        if (recentTokenCount >= 3) {
+            throw new TooManyRequestsException("Too many email verification requests. Please try again later.");
+        }
+
+        emailVerificationTokenRepository.revokeAllUserTokens(user.getId());
 
         EmailVerificationToken emailVerificationToken = generateToken
                 (user, EmailVerificationToken::new, verificationExpiryHours);
-        tokenRepository.save(emailVerificationToken);
+        emailVerificationTokenRepository.save(emailVerificationToken);
 
         emailService.sendVerificationEmail(user, emailVerificationToken.getToken());
     }
