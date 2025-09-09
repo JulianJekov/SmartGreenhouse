@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,4 +18,6 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
     @Modifying
     @Query("UPDATE PasswordResetToken t SET t.revoked = true WHERE t.user.id = :userId AND t.revoked = false ")
     void revokeAllUserTokens(@Param("userId") Long id);
+
+    List<PasswordResetToken> findByUserIdAndCreatedAfter(Long id, Instant oneHourAgo);
 }
