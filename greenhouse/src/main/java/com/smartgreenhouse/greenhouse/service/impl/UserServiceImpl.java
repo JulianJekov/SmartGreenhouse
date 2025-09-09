@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -139,6 +140,14 @@ public class UserServiceImpl implements UserService {
     public void createPasswordResetToken(String email) {
         User user = getUserByEmail(email);
         LOGGER.info("Creating password reset token for email: {}", email);
+
+        Instant oneHourAgo = Instant.now().minus(1, ChronoUnit.HOURS);
+        List<PasswordResetToken> passwordResetTokens =
+                passwordResetTokenRepository.findByUserIdAndCreatedAfter(user.getId(), oneHourAgo);
+
+        if (passwordResetTokens.size() >= 3) {
+            throw new TooManyRequestsException("Too many password reset requests. Please try again later.");
+        }
 
         passwordResetTokenRepository.revokeAllUserTokens(user.getId());
 
