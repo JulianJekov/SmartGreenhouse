@@ -142,10 +142,10 @@ public class UserServiceImpl implements UserService {
         LOGGER.info("Creating password reset token for email: {}", email);
 
         Instant oneHourAgo = Instant.now().minus(1, ChronoUnit.HOURS);
-        List<PasswordResetToken> passwordResetTokens =
-                passwordResetTokenRepository.findByUserIdAndCreatedAfter(user.getId(), oneHourAgo);
 
-        if (passwordResetTokens.size() >= 3) {
+        long recentTokenCount = passwordResetTokenRepository.countRecentTokensByUserId(user.getId(), oneHourAgo);
+
+        if (recentTokenCount >= 3) {
             throw new TooManyRequestsException("Too many password reset requests. Please try again later.");
         }
 
