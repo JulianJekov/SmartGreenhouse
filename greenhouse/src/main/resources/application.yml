@@ -39,9 +39,11 @@ app:
         verification:
             subject: "Verify Your Smart Greenhouse Account"
             expiration-hours: 24
+            max-attempts-per-hour: 3
         password-reset:
             subject: "Reset Your Greenhouse Password"
             expiration-hours: 1
+            max-attempts-per-hour: 3
 mqtt:
     broker-url: tcp://localhost:1883
     client-id: greenhouse-app
