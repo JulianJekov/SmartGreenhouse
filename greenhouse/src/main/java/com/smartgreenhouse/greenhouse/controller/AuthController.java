@@ -7,6 +7,7 @@ import com.smartgreenhouse.greenhouse.exceptions.InvalidTokenException;
 import com.smartgreenhouse.greenhouse.jwt.JWTHelper;
 import com.smartgreenhouse.greenhouse.service.RefreshTokenService;
 import com.smartgreenhouse.greenhouse.service.AuthService;
+import com.smartgreenhouse.greenhouse.util.CookieUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -25,13 +26,15 @@ public class AuthController {
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
     private final JWTHelper jWTHelper;
+    private final CookieUtil cookieUtil;
 
     public AuthController(AuthService authService,
                           RefreshTokenService refreshTokenService,
-                          JWTHelper jWTHelper) {
+                          JWTHelper jWTHelper, CookieUtil cookieUtil) {
         this.authService = authService;
         this.refreshTokenService = refreshTokenService;
         this.jWTHelper = jWTHelper;
+        this.cookieUtil = cookieUtil;
     }
 
     @PostMapping("/register")
@@ -47,15 +50,7 @@ public class AuthController {
         AuthResponse authResponse = authService.login(loginRequest);
         RefreshToken refreshToken = refreshTokenService.generateRefreshToken(loginRequest.getEmail());
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/auth/refresh")
-                .maxAge(Duration.ofDays(7))
-                .sameSite("Strict")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        cookieUtil.setRefreshTokenCookie(response, refreshToken.getToken());
 
         return ResponseEntity.ok(authResponse);
     }
@@ -69,15 +64,7 @@ public class AuthController {
             refreshTokenService.revokeRefreshToken(refreshToken);
         }
 
-        ResponseCookie clearCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/auth/refresh")
-                .maxAge(0)
-                .sameSite("Strict")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, clearCookie.toString());
+        cookieUtil.clearRefreshTokenCookie(response);
 
         return ResponseEntity.ok().build();
     }
@@ -96,15 +83,7 @@ public class AuthController {
         String newAccessToken = jWTHelper.generateToken(user.getEmail(), user.getRole().name());
         RefreshToken newRefreshToken = refreshTokenService.generateRefreshToken(user.getEmail());
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken.getToken())
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/auth/refresh")
-                .maxAge(Duration.ofDays(7))
-                .sameSite("Strict")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        cookieUtil.setRefreshTokenCookie(response, newRefreshToken.getToken());
 
         AuthResponse authResponse = new AuthResponse();
         authResponse.setToken(newAccessToken);
