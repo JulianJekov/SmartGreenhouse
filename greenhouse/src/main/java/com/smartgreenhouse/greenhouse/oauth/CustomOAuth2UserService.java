@@ -28,6 +28,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oauth2User.getAttribute("email");
         String name = oauth2User.getAttribute("name");
 
+        if (email == null || email.trim().isEmpty()) {
+            throw new OAuth2AuthenticationException("Email not provided by OAuth2 provider");
+        }
+
         userRepository.findByEmail(email)
                 .orElseGet(() -> createUser(email, name));
 
