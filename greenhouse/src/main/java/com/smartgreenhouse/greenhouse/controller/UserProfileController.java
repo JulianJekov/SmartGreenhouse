@@ -1,5 +1,6 @@
 package com.smartgreenhouse.greenhouse.controller;
 
+import com.smartgreenhouse.greenhouse.dto.user.ChangePasswordRequest;
 import com.smartgreenhouse.greenhouse.dto.user.UserDTO;
 import com.smartgreenhouse.greenhouse.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +23,19 @@ public class UserProfileController {
         UserDTO currentUser = userService.getCurrentUser(userDetails.getUsername());
         return ResponseEntity.ok(currentUser);
     }
-//
+
+    //
 //    @PutMapping
 //    public UserDTO updateProfile(@AuthenticationPrincipal UserDetails userDetails,
 //                                 @RequestBody UpdateProfileRequest request) {
 //        return userService.updateProfile(userDetails.getUsername(), request);
 //    }
 //
-//    @PostMapping("/change-password")
-//    public ResponseEntity<String> changePassword(@AuthenticationPrincipal UserDetails userDetails,
-//                                                 @RequestBody ChangePasswordRequest request) {
-//        userService.changePassword(userDetails.getUsername(), request);
-//        return ResponseEntity.ok("Password changed successfully");
-//    }
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(userDetails.getUsername(), request);
+        return ResponseEntity.ok("Password changed successfully");
+    }
 }
