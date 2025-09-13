@@ -1,6 +1,7 @@
 package com.smartgreenhouse.greenhouse.service.impl;
 
 import com.smartgreenhouse.greenhouse.entity.User;
+import com.smartgreenhouse.greenhouse.enums.WateringSource;
 import com.smartgreenhouse.greenhouse.exceptions.EmailException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.time.Instant;
 
 @Service
 public class EmailService {
@@ -53,6 +56,28 @@ public class EmailService {
 
         sendEmail(user.getEmail(), passwordResetSubject, htmlContent);
 
+    }
+
+    public void sendWateringNotification(String toEmail, String name, Long greenhouseId, String greenhouseName,
+                                         WateringSource source, boolean success, Double amount, int attempts,
+                                         String errorDetails) {
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("success", success);
+        context.setVariable("source", source);
+        context.setVariable("greenhouseId", greenhouseId);
+        context.setVariable("greenhouseName", greenhouseName);
+        context.setVariable("amount", amount);
+        context.setVariable("attempts", attempts);
+        context.setVariable("time", Instant.now().toString());
+        context.setVariable("errorDetails", errorDetails);
+
+        String htmlContent = templateEngine.process("watering-notification", context);
+        String subject = String.format("Watering %s - %s",
+                success ? "Successful" : "Failed",
+                source.equals(WateringSource.MANUAL) ? "Manual Watering" : "Auto Watering");
+
+        sendEmail(toEmail, subject, htmlContent);
     }
 
     private void sendEmail(String to, String subject, String htmlContent) {
