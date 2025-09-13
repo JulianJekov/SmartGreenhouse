@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Watering Notification</title>
+    <style>
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+<h2>Watering Notification 🌊</h2>
+
+<p>Hello <span th:text="${name}">User</span>,</p>
+
+<div th:classappend="${success} ? 'success' : 'error'">
+    <h3 th:text="${success} ? '✅ Watering Successful' : '❌ Watering Failed'"></h3>
+    <p><strong>Type:</strong> <span th:text="${source} == T(com.smartgreenhouse.greenhouse.enums.WateringSource).MANUAL
+                          ? 'Manual Watering' : 'Auto Watering'">
+            </span></p>
+</div>
+
+<div>
+    <p><strong>Greenhouse:</strong> <span th:text="${greenhouseName}">Name</span> (ID: <span th:text="${greenhouseId}">123</span>)</p>
+    <p><strong>Amount:</strong> <span th:text="${amount}">500</span> ml</p>
+    <p><strong>Attempts:</strong> <span th:text="${attempts}">1</span></p>
+    <p><strong>Time:</strong> <span th:text="${time}">2024-01-15T10:30:00Z</span></p>
+
+    <div th:if="${!success}">
+        <p><strong>Error:</strong> <span th:text="${errorDetails}">Error message</span></p>
+    </div>
+</div>
+
+<p>Happy gardening! 🌱</p>
+</body>
+</html>
