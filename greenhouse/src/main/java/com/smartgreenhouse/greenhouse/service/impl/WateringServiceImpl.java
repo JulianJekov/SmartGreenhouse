@@ -33,15 +33,18 @@ public class WateringServiceImpl implements WateringService {
     private final WateringLogMapper wateringLogMapper;
     private final SimulatedWateringActuator wateringActuator;
     private final Map<Long, Boolean> wateringLocks = new ConcurrentHashMap<>();
+    private final NotificationService notificationService;
 
     public WateringServiceImpl(WateringLogRepository wateringLogRepository,
                                GreenhouseRepository greenhouseRepository,
                                WateringLogMapper wateringLogMapper,
-                               SimulatedWateringActuator wateringActuator) {
+                               SimulatedWateringActuator wateringActuator,
+                               NotificationService notificationService) {
         this.wateringLogRepository = wateringLogRepository;
         this.greenhouseRepository = greenhouseRepository;
         this.wateringLogMapper = wateringLogMapper;
         this.wateringActuator = wateringActuator;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -82,6 +85,7 @@ public class WateringServiceImpl implements WateringService {
     private void performWatering(Greenhouse greenhouse, Double amount, WateringSource wateringSource) {
         boolean success = false;
         int attempts = 0;
+        String errorDetails = null;
         while (!success && attempts < MAX_ATTEMPTS) {
             attempts++;
             success = wateringActuator.activateWatering(greenhouse.getId(), amount);
@@ -90,14 +94,19 @@ public class WateringServiceImpl implements WateringService {
                 try {
                     Thread.sleep(RETRY_DELAY_MS);
                 } catch (InterruptedException e) {
+                    errorDetails = "Watering interrupted during retry - attempt " + attempts;
                     Thread.currentThread().interrupt();
+                    break;
                 }
             }
         }
-
+        notificationService.sendWateringNotification(
+                greenhouse.getId(), wateringSource, success, amount, attempts, errorDetails);
         if (success) {
             createWateringLog(greenhouse, amount, wateringSource);
-            LOGGER.info("Successfully {} watered greenhouse with ID: {} from {} attempt", wateringSource, greenhouse.getId(), attempts);
+
+            LOGGER.info("Successfully {} watered greenhouse with ID: {} from {} attempt",
+                    wateringSource, greenhouse.getId(), attempts);
         } else {
             throw new WateringFailedException
                     ("Watering failed after " + attempts + " attempts for greenhouse " + greenhouse.getId());
