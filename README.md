@@ -14,12 +14,15 @@
 ## ✨ Features
 
 ✅ **JWT Authentication** with refresh & logout  
+✅ OAuth2 Login (Google, GitHub, etc.)
 ✅ **User-based access** – each user sees only their greenhouses  
 ✅ **Greenhouse & Sensor Management**  
 ✅ **Automatic & Manual Watering** with logs  
 ✅ **Sensor Readings** (latest + historical)  
 ✅ **Email Verification**
-✅ **Forgot Password Flow** (in progress ⚡)  
+✅ Forgot Password Flow
+✅ Change Password (secure flow with old password check)
+✅ Notifications – email alerts on watering events (manual or automatic)
 ✅ **Error Handling & Custom Exceptions**  
 🚀 Planned: **MQTT Integration** + **Microservices migration**  
 
@@ -40,7 +43,9 @@
 ### 👤 User Management
 - Register, Login, Logout, Refresh tokens  
 - Email verification (via link)  
-- Forgot & Reset password flow  
+- Forgot & Reset password flow
+- Change password (authenticated users)
+- OAuth2 login (Google, GitHub, etc.)
 - Get current user info  
 
 ### 🌿 Greenhouses
@@ -60,7 +65,8 @@
 ### 💧 Watering
 - Manual watering  
 - Automatic watering (scheduled)  
-- Watering logs  
+- Watering logs
+- Email notifications after watering events
 
 ---
 
@@ -94,15 +100,19 @@ mail:
 
 [x] JWT Authentication
 
+[x] OAuth2 Login
+
 [x] User-based resource access
 
 [x] Greenhouse + Sensor CRUD
 
 [x] Email Verification
 
-[ ] Forgot Password (finishing touches)
+[x] Forgot Password
 
-[ ] User Profile updates (name, email, password)
+[x] Change Password
+
+[x] Notifications (watering events)
 
 [ ] MQTT integration for real sensor data
 
