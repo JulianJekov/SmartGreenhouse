@@ -15,9 +15,9 @@
 
 <div th:classappend="${success} ? 'success' : 'error'">
     <h3 th:text="${success} ? '✅ Watering Successful' : '❌ Watering Failed'"></h3>
-    <p><strong>Type:</strong> <span th:text="${source} == T(com.smartgreenhouse.greenhouse.enums.WateringSource).MANUAL
-                          ? 'Manual Watering' : 'Auto Watering'">
-            </span></p>
+    <p><strong>Type:</strong> <span th:text="${source.name()} == 'MANUAL' ? 'Manual Watering' : 'Auto Watering'">
+            </span>
+            </p>
 </div>
 
 <div>
