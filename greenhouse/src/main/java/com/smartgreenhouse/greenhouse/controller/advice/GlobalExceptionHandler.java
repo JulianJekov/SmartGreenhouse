@@ -1,7 +1,9 @@
 package com.smartgreenhouse.greenhouse.controller.advice;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.smartgreenhouse.greenhouse.dto.ErrorResponse;
 import com.smartgreenhouse.greenhouse.exceptions.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,25 +26,43 @@ public class GlobalExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private ResponseEntity<ErrorResponse> buildErrorResponse(
+            Exception ex,
+            HttpStatus status,
+            HttpServletRequest request
+    ) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGeneralException(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex,
+                                                                HttpServletRequest request) {
         LOGGER.error("An unexpected error occurred", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     @ExceptionHandler(ObjectNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFoundException(ObjectNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(ObjectNotFoundException ex,
+                                                                       HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(NameAlreadyExistsException.class)
-    public ResponseEntity<String> handleNameAlreadyExistsException(NameAlreadyExistsException ex) {
+    public ResponseEntity<ErrorResponse> handleNameAlreadyExistsException(NameAlreadyExistsException ex,
+                                                                          HttpServletRequest request) {
         LOGGER.info("Duplicate name detected: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex,
+                                                                                   HttpServletRequest request) {
         LOGGER.warn("Method argument type mismatch for parameter '{}': {}", ex.getName(), ex.getMessage());
 
         String parameterName = ex.getName();
@@ -70,11 +90,12 @@ public class GlobalExceptionHandler {
             );
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        return buildErrorResponse(new IllegalArgumentException(errorMessage), HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
+                                                                               HttpServletRequest request) {
         LOGGER.warn("Validation failed: {}", ex.getMessage());
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -82,86 +103,71 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        return buildErrorResponse(
+                new IllegalArgumentException(errors.toString()),
+                HttpStatus.BAD_REQUEST,
+                request
+        );
     }
 
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex,
+                                                                               HttpServletRequest request) {
         Throwable rootCause = ex.getRootCause();
+        String message = "Malformed JSON request";
         if (rootCause instanceof InvalidFormatException ife) {
             if (Number.class.isAssignableFrom(ife.getTargetType())) {
-                String fieldName = ife.getPath().get(ife.getPath().size() - 1).getFieldName();
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid number format for field '" + fieldName + "': '" + ife.getValue() + "'. Must be a valid number.");
+                String field = ife.getPath().get(ife.getPath().size() - 1).getFieldName();
+                message = "Invalid number format for field '" + field + "'";
             }
             if (ife.getTargetType().isEnum()) {
                 String enumValues = Arrays.toString(ife.getTargetType().getEnumConstants());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid enum value: '" + ife.getValue() + "'. Valid values are: " + enumValues);
+                message = "Invalid enum value. Valid values: " + enumValues;
             }
         }
         LOGGER.warn("Malformed JSON request: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Malformed JSON request. Please check your input data.");
-    }
 
-    @ExceptionHandler(InvalidWaterAmountException.class)
-    public ResponseEntity<String> handleInvalidWaterAmountException(InvalidWaterAmountException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return buildErrorResponse(new IllegalArgumentException(message), HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(AlreadyWateringException.class)
-    public ResponseEntity<String> handleAlreadyWateringException(AlreadyWateringException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleAlreadyWateringException(AlreadyWateringException ex,
+                                                                        HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler({
             MissingServletRequestParameterException.class,
-            IllegalArgumentException.class
+            MissingPathVariableException.class,
+            IllegalArgumentException.class,
+            InvalidWaterAmountException.class,
+            InvalidPasswordException.class,
+            EmailNotVerifiedException.class
     })
-    public ResponseEntity<String> handleBadRequests(Exception ex) {
-        String message = ex instanceof MissingServletRequestParameterException
-                ? String.format("%s parameter is required",
-                ((MissingServletRequestParameterException) ex).getParameterName())
-                : ex.getMessage();
-
-        return ResponseEntity.badRequest()
-                .body(message);
+    public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<String> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex,
+                                                                           HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<String> handleTokenException(InvalidTokenException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(MissingPathVariableException.class)
-    public ResponseEntity<String> handleMissingPathVariableException(MissingPathVariableException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing required path parameter: " + ex.getVariableName());
-    }
-
-    @ExceptionHandler(EmailNotVerifiedException.class)
-    public ResponseEntity<String> handleNotVerifiedException(EmailNotVerifiedException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleTokenException(InvalidTokenException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.UNAUTHORIZED, request);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<String> handleInvalidCredentialsException(InvalidCredentialsException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(InvalidCredentialsException ex,
+                                                                           HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.UNAUTHORIZED, request);
     }
 
     @ExceptionHandler(TooManyRequestsException.class)
-    public ResponseEntity<String> handleTooManyRequestsException(TooManyRequestsException ex) {
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleTooManyRequestsException(TooManyRequestsException ex,
+                                                                        HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.TOO_MANY_REQUESTS, request);
     }
 }
