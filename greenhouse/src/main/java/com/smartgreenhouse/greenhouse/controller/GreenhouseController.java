@@ -39,7 +39,8 @@ public class GreenhouseController {
     )
     @ApiResponses({
             @ApiResponse(
-                    responseCode = "201", description = "Greenhouse created successfully",
+                    responseCode = "201",
+                    description = "Greenhouse created successfully",
                     content = @Content(schema = @Schema(implementation = GreenhouseDTO.class))),
             @ApiResponse(
                     responseCode = "400",
@@ -139,8 +140,14 @@ public class GreenhouseController {
             description = "Permanently deletes a greenhouse and all its associated data"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Greenhouse deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Greenhouse not found")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Greenhouse deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Greenhouse not found"
+            )
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGreenhouse(
@@ -160,7 +167,10 @@ public class GreenhouseController {
                     description = "Settings retrieved successfully",
                     content = @Content(schema = @Schema(implementation = GreenhouseSettingsDTO.class))
             ),
-            @ApiResponse(responseCode = "404", description = "Greenhouse not found")
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Greenhouse not found"
+            )
     })
     @GetMapping("/{id}/settings")
     public ResponseEntity<GreenhouseSettingsDTO> getGreenhouseSettings(
@@ -180,7 +190,10 @@ public class GreenhouseController {
                     description = "Settings updated successfully",
                     content = @Content(schema = @Schema(implementation = GreenhouseSettingsDTO.class))
             ),
-            @ApiResponse(responseCode = "404", description = "Greenhouse not found")
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Greenhouse not found"
+            )
     })
     @PutMapping("/{id}/settings")
     public ResponseEntity<GreenhouseSettingsDTO> updateSettings(
@@ -218,7 +231,10 @@ public class GreenhouseController {
                     description = "Sensors retrieved successfully",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = SensorDTO.class)))
             ),
-            @ApiResponse(responseCode = "404", description = "Greenhouse not found")
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Greenhouse not found"
+            )
     })
     @GetMapping("/{id}/sensors")
     public ResponseEntity<List<SensorDTO>> getGreenhouseSensors(
@@ -233,8 +249,14 @@ public class GreenhouseController {
             description = "Toggles the auto-watering feature for a greenhouse on/off"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Auto-watering toggled successfully"),
-            @ApiResponse(responseCode = "404", description = "Greenhouse not found")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Auto-watering toggled successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Greenhouse not found"
+            )
     })
     @PatchMapping("/{id}/auto-watering")
     public ResponseEntity<Void> toggleAutoWatering(
