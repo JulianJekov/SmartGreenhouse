@@ -142,7 +142,8 @@ public class GlobalExceptionHandler {
             IllegalArgumentException.class,
             InvalidWaterAmountException.class,
             InvalidPasswordException.class,
-            EmailNotVerifiedException.class
+            EmailNotVerifiedException.class,
+            SensorNotActiveException.class
     })
     public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
