@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class SensorReadingDTO {
     private Long id;
     private Double value;
-    private LocalDateTime timestamp;
+    private Instant timestamp;
     private Long sensorId;
     private SensorType sensorType;
     private String sensorUnit;

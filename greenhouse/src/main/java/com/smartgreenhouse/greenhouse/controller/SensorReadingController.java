@@ -10,7 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -48,12 +49,12 @@ public class SensorReadingController {
             @RequestParam Long sensorId,
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to) {
 
-        if (from == null) from = LocalDateTime.now().minusDays(24);
-        if (to == null) to = LocalDateTime.now();
+        if (from == null) from = Instant.now().minus(24, ChronoUnit.DAYS);
+        if (to == null) to = Instant.now();
         List<SensorReadingDTO> sensorReadingsInRange = sensorReadingService
                 .getSensorReadingsInRange(sensorId, userDetails.getUsername(), from, to);
         return ResponseEntity.ok(sensorReadingsInRange);
@@ -63,8 +64,8 @@ public class SensorReadingController {
     public List<SensorReadingDTO> getAllReadingsForSensor(
             @RequestParam Long sensorId,
             @AuthenticationPrincipal  UserDetails userDetails) {
-        LocalDateTime from = LocalDateTime.now().minusMonths(1);
-        LocalDateTime to = LocalDateTime.now();
+        Instant from = Instant.now().minus(1, ChronoUnit.MONTHS);
+        Instant to = Instant.now();
         return sensorReadingService.getSensorReadingsInRange(sensorId, userDetails.getUsername(), from, to);
     }
 }

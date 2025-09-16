@@ -12,7 +12,7 @@ import com.smartgreenhouse.greenhouse.util.sensorReadingMapper.SensorReadingMapp
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +54,7 @@ public class SensorReadingServiceImpl implements SensorReadingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<SensorReadingDTO> getSensorReadingsInRange(Long sensorId, String email, LocalDateTime from, LocalDateTime to) {
+    public List<SensorReadingDTO> getSensorReadingsInRange(Long sensorId, String email, Instant from, Instant to) {
         validateSensorOwnershipOrThrow(sensorId, email);
 
         return sensorReadingRepository

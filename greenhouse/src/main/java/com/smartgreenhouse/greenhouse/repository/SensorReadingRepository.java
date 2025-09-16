@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     Optional<SensorReading> findTopBySensorIdAndSensorGreenhouseUserEmailOrderByTimestampDesc(Long id, String email);
 
     List<SensorReading> findAllBySensorIdAndSensorGreenhouseUserEmailAndTimestampBetweenOrderByTimestampAsc
-            (Long sensorId, String email, LocalDateTime from, LocalDateTime to);
+            (Long sensorId, String email, Instant from, Instant to);
 
     List<SensorReading> findAllBySensorIdOrderByTimestampAsc(Long sensorId);
 

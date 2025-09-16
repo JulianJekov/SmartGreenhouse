@@ -1,7 +1,6 @@
 package com.smartgreenhouse.greenhouse.dto.sensorReading;
 
 import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -18,7 +17,7 @@ import java.time.LocalDateTime;
 public class TimeSeriesPointDTO {
 
     @NotNull(message = "Timestamp is required")
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     @NotNull(message = "Value is required")
     @Positive(message = "Value must be positive")

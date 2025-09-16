@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface SensorRepository extends JpaRepository<Sensor,Long> {
     List<Sensor> findByGreenhouseId(Long greenhouseId);
 
-    Optional<Sensor> findByIdAndGreenhouseUserEmail(Long id, String greenhouseUserEmail);
+    Optional<Sensor> findByIdAndGreenhouseUserEmail(Long id, String email);
 
     List<Sensor> findAllByGreenhouseUserEmail(String email);
 

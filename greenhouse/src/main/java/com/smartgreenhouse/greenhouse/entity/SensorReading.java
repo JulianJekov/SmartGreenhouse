@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "sensor_readings")
@@ -27,5 +28,5 @@ public class SensorReading {
     private Double value;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private Instant timestamp = Instant.now();
 }

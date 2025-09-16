@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "watering_logs")
@@ -18,7 +18,7 @@ public class WateringLog {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     @Column(nullable = false)
     private Double waterAmount;
@@ -35,6 +35,6 @@ public class WateringLog {
     @PrePersist
     private void prePersist() {
         if (timestamp == null)
-            timestamp = LocalDateTime.now();
+            timestamp = Instant.now();
     }
 }

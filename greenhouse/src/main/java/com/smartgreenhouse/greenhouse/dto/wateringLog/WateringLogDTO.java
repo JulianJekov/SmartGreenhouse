@@ -3,7 +3,7 @@ package com.smartgreenhouse.greenhouse.dto.wateringLog;
 import com.smartgreenhouse.greenhouse.enums.WateringSource;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class WateringLogDTO {
     private Long id;
-    private LocalDateTime timestamp;
+    private Instant timestamp;
     private Double waterAmount;
     private Long greenhouseId;
     private String greenhouseName;

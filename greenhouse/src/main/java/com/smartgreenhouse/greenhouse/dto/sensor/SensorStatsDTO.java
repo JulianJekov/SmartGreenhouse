@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -16,5 +16,5 @@ public class SensorStatsDTO {
     private Double minValue;
     private Double maxValue;
     private Double averageValue;
-    private LocalDateTime lastUpdate;
+    private Instant lastUpdate;
 }

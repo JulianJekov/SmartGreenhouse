@@ -2,7 +2,7 @@ package com.smartgreenhouse.greenhouse.dto;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -13,13 +13,13 @@ public class ErrorResponse {
     private String error;
     private String message;
     private String path;
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     public ErrorResponse(int status, String error, String message, String path) {
         this.status = status;
         this.error = error;
         this.message = message;
         this.path = path;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
     }
 }

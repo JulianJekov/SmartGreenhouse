@@ -7,8 +7,6 @@ import com.smartgreenhouse.greenhouse.entity.Sensor;
 import com.smartgreenhouse.greenhouse.entity.SensorReading;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 public class SensorReadingMapper {
 
