@@ -19,7 +19,7 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
 
     List<SensorReading> findAllBySensorIdOrderByTimestampAsc(Long sensorId);
 
-    List<SensorReading> findTop10BySensorIdOrderByTimestamp(Long sensorId);
+    List<SensorReading> findTop10BySensorIdOrderByTimestampDesc(Long sensorId);
 
     @Query("""
             SELECT r

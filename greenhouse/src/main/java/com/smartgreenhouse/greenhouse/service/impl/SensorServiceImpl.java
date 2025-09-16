@@ -89,7 +89,7 @@ public class SensorServiceImpl implements SensorService {
     public SensorStatsDTO getSensorStats(Long sensorId, String email) {
         Sensor sensor = getSensorByIdAndUserOrThrow(sensorId, email);
         Double currentValue = simulatedSensorReader.readValue(sensor);
-        List<SensorReading> lastReadings = sensorReadingRepository.findTop10BySensorIdOrderByTimestamp(sensorId);
+        List<SensorReading> lastReadings = sensorReadingRepository.findTop10BySensorIdOrderByTimestampDesc(sensorId);
         Double minValue = lastReadings.stream().mapToDouble(SensorReading::getValue).min().orElse(0.0);
         Double maxValue = lastReadings.stream().mapToDouble(SensorReading::getValue).max().orElse(0.0);
         Double averageValue = lastReadings.stream().mapToDouble(SensorReading::getValue).average().orElse(0.0);
