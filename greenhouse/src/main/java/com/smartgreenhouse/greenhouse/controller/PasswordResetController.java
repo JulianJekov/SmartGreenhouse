@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/password")
 @Tag(name = "Password reset", description = "Forgot and Reset Password endpoints")
@@ -49,9 +51,9 @@ public class PasswordResetController {
             )
     })
     @PostMapping("/forgot")
-    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         passwordResetService.createPasswordResetToken(request.getEmail());
-        return ResponseEntity.ok("If the email exists, a reset link has been sent");
+        return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link has been sent"));
     }
 
     @Operation(
@@ -81,8 +83,8 @@ public class PasswordResetController {
             )
     })
     @PostMapping("/reset")
-    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
-        return ResponseEntity.ok("Password reset successfully");
+        return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
     }
 }
