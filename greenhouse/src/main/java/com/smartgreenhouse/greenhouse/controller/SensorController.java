@@ -44,25 +44,17 @@ public class SensorController {
             @ApiResponse(
                     responseCode = "201",
                     description = "Sensor created successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SensorDTO.class)
-                    )
+                    content = @Content(schema = @Schema(implementation = SensorDTO.class))
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Resource not found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
-                    )
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Invalid input data",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
     })
 
@@ -82,23 +74,17 @@ public class SensorController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Sensor updated successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SensorDTO.class))
+                    content = @Content(schema = @Schema(implementation = SensorDTO.class))
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Invalid input data",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Resource not found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class))
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
     @PutMapping("/{id}")
@@ -117,9 +103,7 @@ public class SensorController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Sensor found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SensorDTO.class))
+                    content = @Content(schema = @Schema(implementation = SensorDTO.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -182,11 +166,7 @@ public class SensorController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Sensor statistics retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SensorStatsDTO.class)
-
-                    )
+                    content = @Content(schema = @Schema(implementation = SensorStatsDTO.class))
             ),
             @ApiResponse(
                     responseCode = "404",

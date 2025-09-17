@@ -38,13 +38,24 @@ public class AuthController {
         this.cookieUtil = cookieUtil;
     }
 
-    @Operation(summary = "Register a new user", description = "Creates a new user account and sends verification email")
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates a new user account and sends verification email"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "User registered successfully",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "409", description = "Email already exists")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User registered successfully",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email already exists"
+            )
     })
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
@@ -52,14 +63,28 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Login user", description = "Authenticates user and issues JWT + refresh token cookie")
+    @Operation(
+            summary = "Login user",
+            description = "Authenticates user and issues JWT + refresh token cookie"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Login successful",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
-            @ApiResponse(responseCode = "400", description = "Email not verified"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Login successful",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Email not verified"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found"
+            )
     })
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest,
@@ -73,9 +98,15 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
-    @Operation(summary = "Logout user", description = "Revokes refresh token and clear cookie")
+    @Operation(
+            summary = "Logout user",
+            description = "Revokes refresh token and clear cookie"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Logout successful")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Logout successful"
+            )
     })
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
@@ -93,13 +124,22 @@ public class AuthController {
 
     @Operation(
             summary = "Refresh JWT token",
-            description = "Generates new access and refresh tokens using the refresh token cookie")
+            description = "Generates new access and refresh tokens using the refresh token cookie"
+    )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "New token issued",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "New token issued",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid or expired refresh token"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found"
+            )
     })
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(

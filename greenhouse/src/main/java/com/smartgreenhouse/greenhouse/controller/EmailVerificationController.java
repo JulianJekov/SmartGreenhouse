@@ -23,13 +23,20 @@ public class EmailVerificationController {
         this.emailVerificationService = emailVerificationService;
     }
 
-    @Operation(summary = "Verify email address",
-            description = "Verifies user's email address using the verification token sent to their email")
+    @Operation(
+            summary = "Verify email address",
+            description = "Verifies user's email address using the verification token sent to their email"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Email verified successfully",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Verification email sent\"}"))),
-            @ApiResponse(responseCode = "401", description = "Invalid, expired or already used verification token")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Email verified successfully",
+                    content = @Content(schema = @Schema(example = "{\"message\": \"Verification email sent\"}"))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid, expired or already used verification token"
+            )
     })
     @GetMapping("/email")
     public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam String token) {
@@ -37,15 +44,25 @@ public class EmailVerificationController {
         return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
     }
 
-    @Operation(summary = "Resend verification email",
+    @Operation(
+            summary = "Resend verification email",
             description = "Resend email verification link to the user's email address. " +
-                    "Rate limited to prevent spam (max 3 attempts per hour).")
+                    "Rate limited to prevent spam (max 3 attempts per hour)."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Verification email sent successfully",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Verification email sent\"}"))),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "429", description = "Too many verification requests. Please try again later.")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Verification email sent successfully",
+                    content = @Content(schema = @Schema(example = "{\"message\": \"Verification email sent\"}"))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found"
+            ),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too many verification requests. Please try again later."
+            )
     })
     @PostMapping("/resend")
     public ResponseEntity<Map<String, String>> resendVerificationEmail(@RequestParam String email) {

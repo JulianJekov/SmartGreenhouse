@@ -1,6 +1,5 @@
 package com.smartgreenhouse.greenhouse.controller;
 
-import com.nimbusds.oauth2.sdk.SuccessResponse;
 import com.smartgreenhouse.greenhouse.dto.ErrorResponse;
 import com.smartgreenhouse.greenhouse.dto.user.ForgotPasswordRequest;
 import com.smartgreenhouse.greenhouse.dto.user.ResetPasswordRequest;
@@ -39,10 +38,8 @@ public class PasswordResetController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Password reset email sent if account exists",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"If the email exists, a reset link has been sent\"\"}"
-                            ))
+                    content = @Content(schema = @Schema(example =
+                            "{\"message\": \"If the email exists, a reset link has been sent\"\"}"))
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -64,17 +61,12 @@ public class PasswordResetController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Password reset successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Password reset successfully\"}"))
+                    content = @Content(schema = @Schema(example = "{\"message\": \"Password reset successfully\"}"))
             ),
             @ApiResponse(
                     responseCode = "401",
                     description = "Invalid token or expired token",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class)
-                    )
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(
                     responseCode = "400",
