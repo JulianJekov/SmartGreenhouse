@@ -24,6 +24,7 @@
 ✅ Change Password (secure flow with old password check)  
 ✅ Notifications – email alerts on watering events (manual or automatic)  
 ✅ Error Handling & Custom Exceptions  
+✅ Swagger/OpenAPI documentation  
 🚀 Planned: MQTT Integration + Microservices migration  
 ---
 
@@ -113,8 +114,8 @@ mail:
 
 [x] Notifications (watering events)
 
-[ ] MQTT integration for real sensor data
+[x] Swagger/OpenAPI docs
 
-[ ] Swagger/OpenAPI docs
+[ ] MQTT integration for real sensor data
 
 [ ] Microservices
