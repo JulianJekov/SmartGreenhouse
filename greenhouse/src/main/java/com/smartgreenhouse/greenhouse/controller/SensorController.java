@@ -48,7 +48,7 @@ public class SensorController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Resource not found",
+                    description = "Greenhouse not found or access denied",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(
@@ -83,7 +83,7 @@ public class SensorController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Resource not found",
+                    description = "Greenhouse or Sensor not found. Or access denied",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
