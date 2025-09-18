@@ -3,7 +3,6 @@ package com.smartgreenhouse.greenhouse.controller;
 import com.smartgreenhouse.greenhouse.dto.ErrorResponse;
 import com.smartgreenhouse.greenhouse.enums.WateringSource;
 import com.smartgreenhouse.greenhouse.service.WateringService;
-import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -72,15 +71,7 @@ public class WateringController {
             @RequestParam Long greenhouseId,
             @RequestParam Double amount,
             @AuthenticationPrincipal UserDetails userDetails) {
-        if (amount == null) {
-            throw new IllegalArgumentException("Water amount parameter is required");
-        }
-        try {
-            wateringService.waterGreenhouse(greenhouseId, userDetails.getUsername(), amount, WateringSource.MANUAL);
-            return ResponseEntity.ok().build();
-        } catch (WateringFailedException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-
+        wateringService.waterGreenhouse(greenhouseId, userDetails.getUsername(), amount, WateringSource.MANUAL);
+        return ResponseEntity.ok(Map.of("message","Watering completed successfully"));
     }
 }

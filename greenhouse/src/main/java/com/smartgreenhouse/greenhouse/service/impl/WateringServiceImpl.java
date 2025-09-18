@@ -65,7 +65,10 @@ public class WateringServiceImpl implements WateringService {
     }
 
     private static void validateWaterAmount(Double amount) {
-        if (amount == null || amount <= 0) {
+        if (amount == null) {
+            throw new InvalidWaterAmountException("Water amount parameter is required");
+        }
+        if (amount <= 0) {
             throw new InvalidWaterAmountException("Water amount must be positive");
         }
     }

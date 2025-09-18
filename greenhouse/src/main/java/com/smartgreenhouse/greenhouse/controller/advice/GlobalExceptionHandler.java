@@ -171,4 +171,10 @@ public class GlobalExceptionHandler {
                                                                         HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.TOO_MANY_REQUESTS, request);
     }
+
+    @ExceptionHandler(WateringFailedException.class)
+    public ResponseEntity<ErrorResponse> handleWateringFailed(WateringFailedException ex,
+                                                              HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.FAILED_DEPENDENCY, request);
+    }
 }
