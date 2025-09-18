@@ -1,5 +1,6 @@
 package com.smartgreenhouse.greenhouse.config;
 
+import com.smartgreenhouse.greenhouse.config.security.RestAuthenticationEntryPoint;
 import com.smartgreenhouse.greenhouse.jwt.JWTHelper;
 import com.smartgreenhouse.greenhouse.jwt.JwtAuthFilter;
 import com.smartgreenhouse.greenhouse.oauth.CustomOAuth2UserService;
@@ -63,6 +64,8 @@ public class SecurityConfig {
                         .successHandler(oauth2SuccessHandler())
                         .failureHandler(oath2FailureHandler())
                 )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new RestAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

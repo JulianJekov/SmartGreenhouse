@@ -42,7 +42,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         cookieUtil.setRefreshTokenCookie(response,refreshToken.getToken());
 
-        // Return JWT token as JSON response
         response.setContentType("application/json");
         response.getWriter().write(
                 String.format("{\"token\": \"%s\", \"email\": \"%s\"}",
