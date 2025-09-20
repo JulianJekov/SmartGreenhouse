@@ -2,6 +2,7 @@ package com.smartgreenhouse.greenhouse.service.impl;
 
 import com.smartgreenhouse.greenhouse.exceptions.AlreadyWateringException;
 import com.smartgreenhouse.greenhouse.exceptions.InvalidWaterAmountException;
+import com.smartgreenhouse.greenhouse.mqtt.WateringEventDTO;
 import com.smartgreenhouse.greenhouse.simulation.SimulatedWateringActuator;
 import com.smartgreenhouse.greenhouse.dto.wateringLog.CreateWateringLogDTO;
 import com.smartgreenhouse.greenhouse.entity.Greenhouse;
