@@ -3,6 +3,7 @@ package com.smartgreenhouse.greenhouse.config;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,7 @@ public class MqttConfig {
 
     @Bean
     public MqttClient mqttClient(MqttConnectOptions options) throws MqttException {
-        MqttClient client = new MqttClient(brokerUrl, clientId);
+        MqttClient client = new MqttClient(brokerUrl, clientId, new MemoryPersistence());
         client.connect(options);
         return client;
     }
