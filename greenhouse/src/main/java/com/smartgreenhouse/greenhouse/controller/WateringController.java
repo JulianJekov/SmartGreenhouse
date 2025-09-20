@@ -1,7 +1,10 @@
 package com.smartgreenhouse.greenhouse.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.smartgreenhouse.greenhouse.dto.ErrorResponse;
 import com.smartgreenhouse.greenhouse.enums.WateringSource;
+import com.smartgreenhouse.greenhouse.mqtt.MqttWateringPublisher;
+import com.smartgreenhouse.greenhouse.mqtt.WateringEventDTO;
 import com.smartgreenhouse.greenhouse.service.WateringService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,10 +28,10 @@ import java.util.Map;
 @Tag(name = "Watering", description = "API for manual watering")
 public class WateringController {
 
-    private final WateringService wateringService;
+    private final MqttWateringPublisher wateringPublisher;
 
-    public WateringController(WateringService wateringService) {
-        this.wateringService = wateringService;
+    public WateringController(MqttWateringPublisher wateringPublisher) {
+        this.wateringPublisher = wateringPublisher;
     }
 
     @Operation(
@@ -70,8 +74,9 @@ public class WateringController {
     public ResponseEntity<Map<String, String>> manualWatering(
             @RequestParam Long greenhouseId,
             @RequestParam Double amount,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        wateringService.waterGreenhouse(greenhouseId, userDetails.getUsername(), amount, WateringSource.MANUAL);
-        return ResponseEntity.ok(Map.of("message","Watering completed successfully"));
+            @AuthenticationPrincipal UserDetails userDetails) throws MqttException, JsonProcessingException {
+        wateringPublisher.publishWateringEvent(
+                new WateringEventDTO(greenhouseId, userDetails.getUsername(), amount, WateringSource.MANUAL));
+        return ResponseEntity.ok(Map.of("message", "Watering completed successfully"));
     }
 }
