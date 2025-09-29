@@ -68,13 +68,23 @@ public class WateringController {
             @ApiResponse(
                     responseCode = "401",
                     description = "Authentication required"
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "MQTT broker unavailable - cannot publish watering event",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Unexpected server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
     })
     @PostMapping("/manual")
     public ResponseEntity<Map<String, String>> manualWatering(
             @RequestParam Long greenhouseId,
             @RequestParam Double amount,
-            @AuthenticationPrincipal UserDetails userDetails) throws MqttException, JsonProcessingException {
+            @AuthenticationPrincipal UserDetails userDetails) {
         wateringPublisher.publishWateringEvent(
                 new WateringEventDTO(greenhouseId, userDetails.getUsername(), amount, WateringSource.MANUAL));
         return ResponseEntity.ok(Map.of("message", "Watering completed successfully"));
