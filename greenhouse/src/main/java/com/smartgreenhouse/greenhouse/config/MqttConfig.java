@@ -18,10 +18,15 @@ public class MqttConfig {
     private String clientId;
 
     @Bean
-    public MqttClient mqttClient(MqttConnectOptions options) throws MqttException {
-        MqttClient client = new MqttClient(brokerUrl, clientId, new MemoryPersistence());
-        client.connect(options);
-        return client;
+    public MqttClient mqttClient(MqttConnectOptions options) {
+        try {
+            MqttClient client = new MqttClient(brokerUrl, clientId, new MemoryPersistence());
+            client.connect(options);
+            return client;
+        } catch (MqttException e) {
+            throw new IllegalStateException("Failed to connect to MQTT broker at " + brokerUrl, e);
+        }
+
     }
 
     @Bean
