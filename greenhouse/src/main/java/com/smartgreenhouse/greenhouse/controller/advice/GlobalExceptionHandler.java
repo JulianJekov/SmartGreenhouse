@@ -177,4 +177,10 @@ public class GlobalExceptionHandler {
                                                               HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.FAILED_DEPENDENCY, request);
     }
+
+    @ExceptionHandler(MqttPublishException.class)
+    public ResponseEntity<ErrorResponse> handleMqttPublishException(MqttPublishException ex,
+                                                                    HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.SERVICE_UNAVAILABLE, request);
+    }
 }
