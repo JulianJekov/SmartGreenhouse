@@ -3,6 +3,8 @@ package com.smartgreenhouse.greenhouse.controller;
 import com.smartgreenhouse.greenhouse.dto.ErrorResponse;
 import com.smartgreenhouse.greenhouse.dto.greenhouse.*;
 import com.smartgreenhouse.greenhouse.dto.sensor.SensorDTO;
+import com.smartgreenhouse.greenhouse.mqtt.MqttAutoWateringTogglePublisher;
+import com.smartgreenhouse.greenhouse.mqtt.ToggleAutoWateringDTO;
 import com.smartgreenhouse.greenhouse.service.GreenhouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -28,9 +30,11 @@ import java.util.List;
 public class GreenhouseController {
 
     private final GreenhouseService greenhouseService;
+    private final MqttAutoWateringTogglePublisher mqttAutoWateringTogglePublisher;
 
-    public GreenhouseController(GreenhouseService greenhouseService) {
+    public GreenhouseController(GreenhouseService greenhouseService, MqttAutoWateringTogglePublisher mqttAutoWateringTogglePublisher) {
         this.greenhouseService = greenhouseService;
+        this.mqttAutoWateringTogglePublisher = mqttAutoWateringTogglePublisher;
     }
 
     @Operation(
@@ -262,8 +266,7 @@ public class GreenhouseController {
     public ResponseEntity<Void> toggleAutoWatering(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
-
-        greenhouseService.toggleAutoWatering(id, userDetails.getUsername());
+        mqttAutoWateringTogglePublisher.publishToggleAutoWateringEvent(new ToggleAutoWateringDTO(id, userDetails.getUsername()));
         return ResponseEntity.noContent().build();
     }
 }
